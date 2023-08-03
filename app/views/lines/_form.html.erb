@@ -1,0 +1,61 @@
+<%= form_with(model: line) do |form| %>
+  <% if line.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(line.errors.count, "error") %> prohibited this line from being saved:</h2>
+
+      <ul>
+        <% line.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :file, "Logo de Linea", style: "display:block;" %>
+    <%= form.file_field :file, class: "form-control" %>
+    <small id="nameHelp" class="form-text text-muted">Elige una imagen en representacion de la linea</small>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :name, "Nombre de Linea", style: "display: block" %>
+    <%= form.text_field :name, class: "form-control" %>
+    <small id="nameHelp" class="form-text text-muted">Nombre comun de como se conoce la linea</small>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :line_identifier, style: "display: block" %>
+    <%= form.text_field :line_identifier, class: "form-control", placeholder: "MET" %>
+    <small id="nameHelp" class="form-text text-muted">identificador interno a ABB para encontrar los DFT y QG</small>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :remotepath, style: "display: block" %>
+    <%= form.text_field :remotepath, class: "form-control" %>
+    <small id="nameHelp" class="form-text text-muted">Path hacia archivos remotos de DFT y QG</small>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :trackingpath, style: "display: block" %>
+    <%= form.text_field :trackingpath, class: "form-control" %>
+    <small id="nameHelp" class="form-text text-muted">Path hacia tracking data guardados</small>
+  </div>
+
+  <% unless @line.new_record? %>
+  <div class="form-group">
+    <%= form.label :default_model, "Modelo for defecto", style: "display:block" %>
+    <%= form.select :default_model, line.translated_models_for_options.unshift(["---", ""]), {}, { class: "form-control" } %>
+  </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :model_translation, style: "display: block" %> 
+    <small id="nameHelp" class="form-text text-muted">Importante! Formato de informacion. Usualmente se llena en forma automatica. El formato es imperativo para un funcionamiento correcto.</small>
+    <%= form.text_area :model_translation, class: "form-control", size: "70x5" %>
+    <small id="nameHelp" class="form-text text-muted">Formato: 000:MODELONOMBRE,001:MODELNOMBRE,etc...</small>
+  </div>
+
+  <div class="form-group mt-3">
+    <%= form.submit "#{line.new_record? ? "Crear Nueva" : "Actualizar"} Estación", class: "btn btn-info" %>
+  </div>
+<% end %>

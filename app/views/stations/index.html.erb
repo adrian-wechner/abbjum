@@ -1,0 +1,14 @@
+<%= render partial: "layouts/callouts" %>
+
+<h1>Stations</h1>
+
+<div id="stations">
+  <% @stations.each do |station| %>
+    <%= render station %>
+    <p>
+      <%= link_to "Show this station", line_station_url(@line, station) %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "Nueva Estacion", new_line_station_path %>

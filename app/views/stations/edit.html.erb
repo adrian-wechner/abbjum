@@ -1,0 +1,17 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+
+  <h1>Editing station</h1>
+
+  <%= render "form", station: @station %>
+
+  <hr class="hr hr-blurry" />
+
+  <%= link_to "Show this station", line_station_path(@line, @station), class: "btn btn-primary" %> |
+  <%= link_to "Back to stations", line_stations_path(@line), class: "btn btn-primary" %>
+  
+  <hr class="hr hr-blurry" />
+
+  <%= button_to "Destroy this station", line_station_path(@line, @station), class: "btn btn-danger", method: :delete, data: { turbo_confirm: "Seguro que quierer borrar esta estacion?" } %>
+</div>

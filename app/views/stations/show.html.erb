@@ -1,0 +1,12 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+
+  <h3>Estación <%= @station.name %></h3>
+  <%= render @station %>
+
+  <div class="mt-3">
+    <a href="<%=line_path(@line)%>" class="btn btn-primary">Regresar a Linea</a>
+    <a href="<%=edit_line_station_path(@line, @station)%>" class="btn btn-info">Editar</a>
+  </div>
+</div>

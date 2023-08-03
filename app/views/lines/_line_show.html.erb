@@ -1,0 +1,47 @@
+
+<div class="row mb-3">
+  <div class="card" style="width: 100%;">
+    <div class="row no-gutters">
+      <div class="col-sm-5">
+        <%= image_tag(line.file.variant(resize_to_fill: [300, 200]), style: "width:100%;", class: "card-img") %>
+      </div>
+      <div class="col-sm-7">
+        <div class="card-body">
+          <h5 class="card-title"><%= line.name %></h5>
+          <p class="card-text">
+            <table class="table" style="table-layout:fixed;">
+              <tr> <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><span class="text-secondary">Line Identifier:</span> <%= line.line_identifier %></td> </tr> 
+              <tr> <td class="overflow-hidden" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><span class="text-secondary">Remote Path:</span> <span class="overflow-hidden"><%= line.remotepath %></span></td> </tr> 
+              <tr> <td class="overflow-hidden" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><span class="text-secondary">Tracking Path:</span> <%= line.trackingpath %></td> </tr> 
+              <tr> <td class="" style=""><span class="text-secondary">Modelo por defecto:</span> <%= line.default_model %></td> </tr> 
+              <tr> <td class="" style=""><span class="text-secondary">Traduccion de Modelos:</span> <%= line.model_translation %></td> </tr> 
+            </table>
+            </p>
+          <a href="<%=edit_line_path(line)%>" class="btn btn-info">Editar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="padding-top:30px" class="row mb-3 table-responsive">
+  <h3>
+    <span>Estaciones</span>
+    <a href="<%= new_line_station_path(line) %>" type='button' class='btn btn-primary'>+ Agregar</a>
+  </h3>
+
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>  
+        <th scope="col">Model</th>  
+        <th scope="col">Ingersoll</th>  
+        <th scope="col">Hipots</th>  
+      </tr> 
+    </thead>
+    <% line.stations.sort_by(&:name).each do |station| %>
+      <%= render partial: "station_table_row", locals: { line: line, station: station } %>
+    <% end %>
+  </table>
+</div>
+    

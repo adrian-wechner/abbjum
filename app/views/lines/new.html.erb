@@ -1,0 +1,12 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+<h1>Nueva Linea</h1>
+
+<%= render "form", line: @line %>
+
+<hr class="hr hr-blurry" />
+
+<%= link_to "Regresar a Lineas", lines_path, class: "btn btn-primary" %>
+
+</div>

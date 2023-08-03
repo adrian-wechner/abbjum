@@ -1,0 +1,14 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3 bd-content">
+ 
+  <h3>Nueva estación para <%= @line.name %></h3>
+
+  <%= render "form", station: @station %>
+
+  <br>
+
+  <div class="highlight">
+    <%= link_to "Back to stations", line_stations_url(@line, @station) %>
+  </div>
+</div>

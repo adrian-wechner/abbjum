@@ -1,0 +1,93 @@
+<%= form_with(model: [@line, station]) do |form| %>
+  <%= form.hidden_field :line_id %>
+  <% if station.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(station.errors.count, "error") %> prohibited this station from being saved:</h2>
+
+      <ul>
+        <% station.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<!--
+  <div class="form-group">
+    <%= form.label :line_id, style: "display: block" %>
+    <%= form.hidden_field :line_id %>
+    <%= @line.name %>
+  </div>
+-->
+  <div class="form-group">
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "ejemplo: ST10" %>
+  </div>
+<!-- 
+  <div>
+    <%= form.label :model, style: "display: block" %>
+    <%= form.text_field :model %>
+  </div>
+-->
+
+  <div class="form-group">
+    <%= form.hidden_field :operator_instructions %>
+    <label>Instrucciones para Operadores</label><br/>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input operator-instructions-checkbox" type="checkbox" value="DFT" id="station_operator_instructions_dft" <%= station.new_record? || station.operator_instructions.to_s.split(",").include?("DFT") ? "checked" : "" %>>
+      <%= form.label "operator_instructions_dft", "DFT", style: "display: block", class: "form-check-label" %>
+    </div>  
+    <div class="form-check form-check-inline">
+      <input class="form-check-input operator-instructions-checkbox" type="checkbox" value="QG" id="station_operator_instructions_qg" <%= station.operator_instructions.to_s.split(",").include?("QG") ? "checked" : ""%>>
+      <%= form.label "operator_instructions_qg", "QG", style: "display: block", class: "form-check-label" %>
+    </div>  
+  </div>
+
+  <div class="form-group">
+    <%= form.label :ingersoll_ips, "Ingersoll IP", style: "display: block" %>
+    <%= form.text_field :ingersoll_ips, class: "form-control", placeholder: "ejemplo: 192.0.0.1, 192.0.0.2" %>
+    <small id="emailHelp" class="form-text text-muted">lista de IP separados con comas</small>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :hipot_ips, "Hipot IP", style: "display: block" %>
+    <%= form.text_field :hipot_ips, class: "form-control", placeholder: "ejemplo: 192.0.0.1, 192.0.0.2"  %>
+    <small id="emailHelp" class="form-text text-muted">lista de IP separados con comas</small>
+  </div>
+
+  <% unless station.new_record? %>
+  <div class="form-group">
+    <%= form.label :model, "Modelos", style: "display:block" %>
+    <%= form.select :model, @line.translated_models_for_options.unshift(["---", ""]), {}, { class: "form-control" } %>
+  </div>
+  <% end %>
+
+  <div class="form-group mt-3">
+    <%= form.submit "#{station.new_record? ? "Crear Nueva" : "Actualizar"} Estación", class: "btn btn-info" %>
+  </div>
+<% end %>
+
+<script>
+  function updateOperatorInstructions() {
+    var arr = [];
+
+    Array.from(document.getElementsByClassName("operator-instructions-checkbox")).forEach(
+      function(element, index, array) {
+        if(element.checked)
+          arr.push(element.value);
+      }
+    ); 
+    document.getElementById("station_operator_instructions").value = arr.join(",");
+  }
+
+  Array.from(document.getElementsByClassName("operator-instructions-checkbox")).forEach(
+    function(element, index, array) {
+      element.addEventListener('change', function() {
+        updateOperatorInstructions();
+      });
+    }
+  );
+
+  updateOperatorInstructions();
+  // });
+</script>

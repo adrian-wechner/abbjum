@@ -1,0 +1,6 @@
+<tr onclick="window.location='<%= line_station_url(line, station) %>'">
+  <td><%= link_to(station.name, line_station_url(line, station)) %></td>
+  <td><%= station.model %></td>
+  <td><%= station.ingersoll_ips%></td>
+  <td><%= station.hipot_ips%></td>
+</tr>

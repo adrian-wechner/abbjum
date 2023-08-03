@@ -1,0 +1,13 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+
+  <h1>Lineas de Producción</h1>
+
+  <% @lines.each do |line| %>
+    <%= render partial: "line_index", locals: { line: line } %>
+  <% end %>
+
+  <%= link_to "Nueva Linea", new_line_path, class: "btn btn-primary" %>
+
+</div>

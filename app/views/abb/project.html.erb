@@ -1,0 +1,41 @@
+
+<% if @what_to_show == :carousel %>
+
+
+<% content_for :corner do %>
+  <div style="position:absolute; left:0; top:0; padding: 10px; z-index:9999;">
+    <a href="/abb/select?l=<%= @line.line_identifier %>" class="btn btn-dark"><</a><br/>
+    <small>
+      Linea: <%= @line.name %><br/>
+      Estacion: <%= @station.name %><br/>
+      Contendido: <%= @content.join(",") %><br/>
+      Modelo: <%= @model %><br/>
+      Seq: <%= @seq_model%>
+    </small>
+  </div>
+<% end %>
+
+<div id="carouselWithIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-pause="false">
+  <div class="carousel-indicators">
+    <% @images.each_with_index do |image, i| %>
+    <button type="button" data-bs-target="#carouselWithIndicators" data-bs-slide-to="<%=i%>" <%= '"class="active" aria-current="true"' if i.zero? %> aria-label="Slide <%=i%>"></button>
+    <% end %>
+  </div>
+
+  <div class="carousel-inner">
+  <% @images.each do |image| %>
+    <div class="carousel-item active" data-bs-interval="5000">
+      <img src="<%= image %>" class="d-block " alt="<%= image %>" />
+    </div>
+  <% end %>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselWithIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselWithIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+<% end %>

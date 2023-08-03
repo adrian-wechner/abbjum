@@ -1,0 +1,15 @@
+<%= render partial: "layouts/callouts" %>
+<div class="container mt-3 mb-3">
+<h1>Editing linea <%= @line.name %></h1>
+
+<%= render "form", line: @line %>
+
+  <hr class="hr hr-blurry" />
+
+  <%= link_to "Ver Detalles de Linea", line_path(@line), class: "btn btn-primary" %> |
+  <%= link_to "Ver todas las lineas", lines_path, class: "btn btn-primary" %>
+  
+  <hr class="hr hr-blurry" />
+
+  <%= button_to "Borrar esta linea", line_path(@line), class: "btn btn-danger", method: :delete, data: { turbo_confirm: "Seguro que quierer borrar esta linea?" } %>
+</div>
