@@ -15,5 +15,6 @@
     <li class="list-group-item"><small>Ingersoll IP:</small>  <%=raw station.ingersoll_ips.to_s.empty? ? "<i>Ningun Ingersoll</i>" : station.ingersoll_ips %></li> 
     <li class="list-group-item"><small>Hipot IP:</small>  <%=raw station.hipot_ips.to_s.empty? ? "<i>Ningun Hipot</i>" : station.hipot_ips %></li> 
     <li class="list-group-item"><small>Modelo Actual:</small>  <%=raw station.model.to_s.empty? ? "<i>Atencion! Modelo no asignado.</i>" : station.model %></li> 
+    <li class="list-group-item"><small>Pieza Actual:</small>  <%=raw station.part_instance.to_s.empty? ? "<i>Atencion! Pieza no asignada.</i>" : station.part_instance %></li> 
   </ul>
 
