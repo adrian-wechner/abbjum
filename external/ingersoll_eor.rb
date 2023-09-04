@@ -3,6 +3,8 @@ conn = PG.connect(:dbname => PG_DBNAME)
 
 port = 1069 # -p [PORT]
 host = 'localhost' # -h [HOST]
+line_ident = ""
+
 s = nil
 
 i = 0
