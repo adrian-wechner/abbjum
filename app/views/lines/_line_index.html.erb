@@ -2,7 +2,7 @@
   <div class="card" style="width: 100%;">
     <div class="row no-gutters">
       <div class="col-sm-5">
-        <%= image_tag(line.file.variant(resize_to_fill: [300, 200]), style: "width:100%;", class: "card-img") %>
+        <%= image_tag(line.file.variant(resize_to_fill: [300, 200]), style: "width:100%;", class: "card-img") if line.file.attached? %>
       </div>
       <div class="col-sm-7">
         <div class="card-body">
@@ -20,44 +20,3 @@
     </div>
   </div>
 </div>
-
-
-
-
-<!-- 
-<div class="row mb-3" id="<%= dom_id line %>">
-
-  <div class="col-md-3">
-    <% if line.file %>
-    <a href="<%=url_for(line)%>"><%= image_tag(line.file.variant(resize_to_fill: [150, 100]), style: "width:100%;") %></a>
-    <% end %>
-  </div>
-
-  <div class="col-md-9">
-
-    <div class="row font-weight-bold">
-      <div class="col-md-12">
-        <p class="fw-bold">Nombre: <%= line.name %></p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12"><span class="text-secondary">Line Identifier:</span> <%= line.line_identifier %></div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12"><span class="text-secondary">Remote Path:</span> <%= line.remotepath.length >=50 ? "..." : "" %><%= line.remotepath.chars.last(50).join %></div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12"><span class="text-secondary">Tracking Path:</span> <%= line.trackingpath.length >= 50 ? "..." : "" %><%= line.trackingpath.chars.last(50).join %></div>
-    </div>
-
-    <div class="row">
-      <%= link_to "Show this line", line %>
-    </div>
-
-  </div>
-
-</div>
--->

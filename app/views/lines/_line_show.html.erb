@@ -3,7 +3,7 @@
   <div class="card" style="width: 100%;">
     <div class="row no-gutters">
       <div class="col-sm-5">
-        <%= image_tag(line.file.variant(resize_to_fill: [300, 200]), style: "width:100%;", class: "card-img") %>
+        <%= image_tag(line.file.variant(resize_to_fill: [300, 200]), style: "width:100%;", class: "card-img") if line.file.attached? %>
       </div>
       <div class="col-sm-7">
         <div class="card-body">
