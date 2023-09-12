@@ -135,6 +135,8 @@ GEM
     nio4r (2.5.9)
     nokogiri (1.15.2-x86_64-darwin)
       racc (~> 1.4)
+    nokogiri (1.15.2-x86_64-linux)
+      racc (~> 1.4)
     pdftoimage (0.2.0)
       iconv (~> 1.0)
       shellwords (~> 0.1.0)
@@ -223,6 +225,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
   bootsnap
@@ -237,6 +240,7 @@ DEPENDENCIES
   pg (~> 1.1)
   puma (~> 5.0)
   rails (~> 7.0.6)
+  ruby-vips
   selenium-webdriver
   sprockets-rails
   stimulus-rails

@@ -6,7 +6,7 @@ class Line < ApplicationRecord
   # [['Option1', 1], ['Option2', 2], ...]
   arr = model_translation.upcase.split(",").map do |e|
     mt = e.strip.split(":") 
-    [mt.last.strip, mt.last.strip] 
+    ["#{mt.first.strip}-#{mt.last.strip}", mt.last.strip] 
   end
   arr.sort_by(&:last)
  end
@@ -69,11 +69,13 @@ class Line < ApplicationRecord
 
   # => /.../3-OP-MET/
   def line_folder_path(location, content)
+    puts "DEBUG: line_folder_path => #{File.join(location_path(location), line_folder_name(content))}"
     File.join(location_path(location), line_folder_name(content))
   end
 
   # => /.../3-OP-MET/001/
   def line_model_folder_path(location, content, model) 
+    puts "DEBUG: line_model_folder_path (#{File.join(line_folder_path(location, content), model)})"
     File.join(line_folder_path(location, content), model)
   end
 
@@ -84,6 +86,7 @@ class Line < ApplicationRecord
 
   def line_model_station_files(location, content, model, station)
     files = Dir["#{line_model_folder_path(location, content, model)}/*"]
+    #puts "FILES DEBUG..... :#{files}"
     files.select {|f| f.match file_name_with_station_regex(content, model, station, "pdf") }
   end
 

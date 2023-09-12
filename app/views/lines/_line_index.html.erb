@@ -2,7 +2,7 @@
   <div class="card" style="width: 100%;">
     <div class="row no-gutters">
       <div class="col-sm-5">
-        <%= image_tag(line.file.variant(resize_to_fill: [300, 200]), style: "width:100%;", class: "card-img") %>
+        <%= image_tag(line.file.variant(resize_to_fill: [300, 200]), style: "width:100%;", class: "card-img")  if line.file.attached? %>
       </div>
       <div class="col-sm-7">
         <div class="card-body">
@@ -14,7 +14,7 @@
               <tr> <td class="overflow-hidden" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><span class="text-secondary">Tracking Path:</span> <%= line.trackingpath %></td> </tr> 
             </table>
           </p>
-          <a href="<%=url_for(line)%>" class="btn btn-info">Ver Detalles</a>
+          <a href="<%=url_for(line)%>" class="btn btn-info">Ver Detalles</a>  
         </div>
       </div>
     </div>
@@ -28,7 +28,7 @@
 <div class="row mb-3" id="<%= dom_id line %>">
 
   <div class="col-md-3">
-    <% if line.file %>
+    <% if line.file.attached? %>
     <a href="<%=url_for(line)%>"><%= image_tag(line.file.variant(resize_to_fill: [150, 100]), style: "width:100%;") %></a>
     <% end %>
   </div>

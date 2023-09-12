@@ -67,6 +67,8 @@ class AbbController < ApplicationController
 
     @content.each do |content|
 
+      puts "CONTENT: #{content}"
+
       if @line && station
         # Testing for "a) Not locall avaiable"
         @what_to_show = :error if @model.to_s.empty?
@@ -104,13 +106,19 @@ class AbbController < ApplicationController
           # 2) copy file from remote source
           # 3) extract sheets
 
+          puts "DEBUG... NEED_TO_EXTRACT_DATA"
+
           # 1)
           @line.line_model_station_files(:local, content, @seq_model, station).each { |f| File.delete(f) }
 
           # 2)
           tmp = @line.line_model_folder_path(:local, content, @seq_model) 
           FileUtils.mkdir_p(tmp)
+
+          puts "##### SERACH REMOTE PATH: #{@line.line_model_station_files(:remote, content, @seq_model, station)} content:#{content} seq:#{@seq_model} sta:#{station}"
+
           @line.line_model_station_files(:remote, content, @seq_model, station).each do |f|
+            puts "##### COPYING #{f}"
             FileUtils.cp(f, File.join(@line.line_model_folder_path(:local, content, @seq_model), @line.file_name_clean_with_extention(content, @seq_model, station, "pdf")))
           end
 
