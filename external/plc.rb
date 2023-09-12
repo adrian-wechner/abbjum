@@ -7,12 +7,12 @@ def relative_folder_to_part_instance(line_ident, station_name, part_instance)
   "/#{line_ident}/#{part_instance}/#{station_name}/"
 end
 
-def track_file_name(line_ident, station_name, part_instance, file_appendix)
+def trck_file_name(line_ident, station_name, part_instance, file_appendix)
   "#{Time.now.strftime("%Y-%m-%d %H-%M-%S")} #{line_ident} #{station_name} #{part_instance} #{file_appendix}"
 end
 
-def track_file_path(line_ident, station_name, part_instance, file_appendix, root_path="")
-  File.join(root_path, relative_folder_to_part_instance(line_ident, station_name, part_instance), track_file_full_path(line_ident, station_name, part_instance, file_appendix))
+def trck_file_path(line_ident, station_name, part_instance, file_appendix, root_path="")
+  File.join(root_path, relative_folder_to_part_instance(line_ident, station_name, part_instance), trck_file_full_path(line_ident, station_name, part_instance, file_appendix))
 end
 
 # MODEL/INSTANCE/TIMESTAMP 
@@ -53,9 +53,9 @@ def model_command(client, data)
   return true
 end
 
-def track_command(client, data)
+def trck_command(client, data)
   if data.length < 4 or data.length > 5
-    puts "PLC SCRIPT: ERROR: WRONG LENGTH(4-5) for TRACK command"
+    puts "PLC SCRIPT: ERROR: WRONG LENGTH(4-5) for TRCK command"
     client.close
     return false
   end
@@ -91,7 +91,7 @@ def track_command(client, data)
     return false 
   end
 
-  File.write(track_file_path(res_line[0]["line_identifier"], res_station[0]["name"], res_station[0]["part_instance"], file_appendix, res_line[0]["trackingpath"]), file_content)
+  File.write(trck_file_path(res_line[0]["line_identifier"], res_station[0]["name"], res_station[0]["part_instance"], file_appendix, res_line[0]["trackingpath"]), file_content)
 
   client.puts "OK"
   return true
@@ -106,7 +106,7 @@ PG_PASSWORD = ""
 # MODEL:[LINE_IDENT]:[STATION_NAME]:[NEWMODEL]  
 # STOP
 # PART:[LINE_IDENT]:[STATION_NAME]:[PART INSTANCE STRING]
-# TRACK:[LINE_IDENT]:[STATION_NAME]:any file name apendix:any file content
+# TRCK:[LINE_IDENT]:[STATION_NAME]:any file name apendix:any file content
 
 # START TCP SERVER
 port_to_listen_to = 8080
@@ -148,24 +148,24 @@ loop {
     # Will Store the PART INSTANCE into the station's record and tracking
     # PART:[LINE_IDENT]:[STATION_NAME]:[PART INSTANCE STRING]
     # a) PART will trigger a MODEL command using the 'model' part of the string
-    # b) PART will trigger a TRACK command using the full string given if formated as "model/sequence/timestamp"
+    # b) PART will trigger a TRCK command using the full string given if formated as "model/sequence/timestamp"
     if command == "PART"
       # CALL MODEL
       model_command(client, data)
 
-      # CALL TRACK
+      # CALL TRCK
       data[3] = "PART #{data[3]}"
-      track_command(client, data)
+      trck_command(client, data)
       next
     end
 
-    ### TRACK COMMAND
-    # TRACK:[LINE_IDENT]:[STATION_NAME]:any file name apendix:any file content
-    # example: TRACK:MET:ST10:SPINDLE 192.168.0.50 PASSED:abc,def,gef
+    ### TRCK COMMAND
+    # TRCK:[LINE_IDENT]:[STATION_NAME]:any file name apendix:any file content
+    # example: TRCK:MET:ST10:SPINDLE 192.168.0.50 PASSED:abc,def,gef
     # IMPORTANTE: track does not specify a part-sequence number. Only the station. In order to track correctly,
     # the track command will verify WHAT "part_instance" is at station.
-    if command == "TRACK"
-      track_command(client, data)
+    if command == "TRCK"
+      trck_command(client, data)
       next
     end
 
