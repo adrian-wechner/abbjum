@@ -1,7 +1,7 @@
 require 'socket'
 require 'pg'
 require 'json'
-
+require 'fileutils'
 
 def relative_folder_to_part_instance(line_ident, station_name, part_instance)
   "/#{line_ident}/#{part_instance}/#{station_name}/"
@@ -12,7 +12,7 @@ def trck_file_name(line_ident, station_name, part_instance, file_appendix)
 end
 
 def trck_file_path(line_ident, station_name, part_instance, file_appendix, root_path="")
-  File.join(root_path, relative_folder_to_part_instance(line_ident, station_name, part_instance), trck_file_full_path(line_ident, station_name, part_instance, file_appendix))
+  File.join(root_path, relative_folder_to_part_instance(line_ident, station_name, part_instance), trck_file_name(line_ident, station_name, part_instance, file_appendix))
 end
 
 # MODEL/INSTANCE/TIMESTAMP 
@@ -62,8 +62,8 @@ def trck_command(client, data)
 
   line_id = data[1]
   station_name = data[2]
-  file_appendix = data[3]
-  file_content = data[4] if data.length == 5
+  file_appendix = "#{data[3]}.txt"
+  file_content = data[4] if data.length >= 5
 
   conn = PG.connect(:dbname => PG_DBNAME)
 
@@ -91,7 +91,14 @@ def trck_command(client, data)
     return false 
   end
 
-  File.write(trck_file_path(res_line[0]["line_identifier"], res_station[0]["name"], res_station[0]["part_instance"], file_appendix, res_line[0]["trackingpath"]), file_content)
+  part_instance = res_station[0]["part_instance"].to_s.strip
+  part_instance = "NO_INSTANCE" if part_instance.empty?
+  file_name = trck_file_path(res_line[0]["line_identifier"], res_station[0]["name"], part_instance, file_appendix, res_line[0]["trackingpath"])
+  dirname = File.dirname(file_name)
+  unless File.directory?(dirname)
+    FileUtils.mkdir_p(dirname)
+  end
+  File.write(file_name, file_content)
 
   client.puts "OK"
   return true
@@ -118,10 +125,8 @@ loop {
   begin
 
     client = server.accept
-    puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime
+    puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime + ' DATA=' + data
     data = client.gets
-
-    puts "PLC SCRIPT: --- #{data}"
 
     # any client request is data formated as COMMAND:[data1]:[data2]:[etc...] 
     data = data.split(":")

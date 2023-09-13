@@ -46,10 +46,10 @@ loop {
       #### SEND DATA TO PLC SCRIPT Server
 
       # example: TRCK:MET:ST10:SPINDLE 192.168.0.50 PASSED:abc,def,gef
-      puts "#{dbug} data"
+      puts "#{dbug} data: #{data}"
 
       # connect to server, send command and debug response
-      command = "TRCK:#{line_ident}:#{station}:SPINDLE #{host}:#{data.trim}"
+      command = "TRCK:#{line_ident}:#{station}:SPINDLE #{host}:#{data.strip}"
       client = TCPSocket.open(plc_script_host, plc_script_port)
       client.puts(command)
       puts client.gets
