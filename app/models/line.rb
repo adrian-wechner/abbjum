@@ -69,13 +69,13 @@ class Line < ApplicationRecord
 
   # => /.../3-OP-MET/
   def line_folder_path(location, content)
-    puts "DEBUG: line_folder_path => #{File.join(location_path(location), line_folder_name(content))}"
+    #puts "DEBUG: line_folder_path => #{File.join(location_path(location), line_folder_name(content))}"
     File.join(location_path(location), line_folder_name(content))
   end
 
   # => /.../3-OP-MET/001/
   def line_model_folder_path(location, content, model) 
-    puts "DEBUG: line_model_folder_path (#{File.join(line_folder_path(location, content), model)})"
+    #puts "DEBUG: line_model_folder_path (#{File.join(line_folder_path(location, content), model)})"
     File.join(line_folder_path(location, content), model)
   end
 
