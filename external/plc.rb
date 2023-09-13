@@ -125,8 +125,8 @@ loop {
   begin
 
     client = server.accept
-    puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime + ' DATA=' + data
     data = client.gets
+    puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime + ' DATA=' + data
 
     # any client request is data formated as COMMAND:[data1]:[data2]:[etc...] 
     data = data.split(":")
