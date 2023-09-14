@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get 'tracking/index'
+  get 'tracking/part'
+  get 'tracking', to: "tracking#index"
   
   get 'abb/index'
   get 'abb/project'

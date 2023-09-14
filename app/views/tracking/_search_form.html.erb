@@ -1,0 +1,19 @@
+<%= form_with url: "/tracking", method: :get do |form| %>
+  <div class="row align-items-center border-1 border-top border-bottom py-3">
+    <div class="col-auto">
+      <%= form.label :line_id, "Linea", class: "col-form-label" %>
+    </div>
+    <div class="col-auto">
+      <%= form.select :line_id, options_for_select(Line.all.collect{ |l| [l.name, l.id] }), {}, { class: "form-select" } %>
+    </div>
+    <div class="col-auto">
+      <%= form.label :instance, "Instancia", class: "col-form-label" %>
+    </div>
+    <div class="col-auto">
+      <%= form.text_field :instance, class: "form-control", placeholder: "ABCDEF000001" %>
+    </div>
+    <div class="col-auto">
+      <%= form.submit "Buscar", class: "btn btn-info" %>
+    </div>
+  </div>
+<% end %>
