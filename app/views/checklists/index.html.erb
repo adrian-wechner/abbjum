@@ -4,6 +4,10 @@
 
 <h1>Checklists</h1>
 
+
+- list of LAST filled checklist
+- list of checklists
+
 <div id="checklists">
   <% @checklists.each do |checklist| %>
     <%= render checklist %>
@@ -12,6 +16,8 @@
     </p>
   <% end %>
 </div>
+
+<h2>Constructor de Checklists</h2>
 
 <%= link_to "New checklist", new_checklist_path %>
 
