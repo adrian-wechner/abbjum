@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @checklist_record %>
+
+<div>
+  <%= link_to "Edit this checklist record", edit_checklist_record_path(@checklist_record) %> |
+  <%= link_to "Back to checklist records", checklist_records_path %>
+
+  <%= button_to "Destroy this checklist record", @checklist_record, method: :delete %>
+</div>

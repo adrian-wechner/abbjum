@@ -1,0 +1,18 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+
+<h1>Checklists</h1>
+
+<div id="checklists">
+  <% @checklists.each do |checklist| %>
+    <%= render checklist %>
+    <p>
+      <%= link_to "Show this checklist", checklist %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New checklist", new_checklist_path %>
+
+</div>

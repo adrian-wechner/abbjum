@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  devise_for :users
+  resources :checklist_records
+  resources :checklist_items
+  resources :checklists
   get 'tracking/index'
   get 'tracking/part'
   get 'tracking', to: "tracking#index"
