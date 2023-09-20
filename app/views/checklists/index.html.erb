@@ -2,23 +2,54 @@
 
 <div class="container mt-3 mb-3">
 
-<h1>Checklists</h1>
+  <div class="row" id="checklists">
+    <h1>
+      <span>Checklists</span>
+      <a href="<%= new_checklist_record_path(ChecklistRecord.new) %>" type='button' class='btn btn-primary'>+ Agregar</a>
+    </h1>
+    <table class="table">
+      <thead>
+        <th>Linea</th>
+        <th>Checklist</th>
+        <th>Catalogo</th>
+        <th>Iniciado</th>
+        <th>Terminado</th>
+      </thead>  
+      <tbody>
+        <% @checklist_records.each do |checklist| %>
+          <tr>
+            <td><%= checklist.line.name %></td>
+            <td><%= checklist.name %></td>
+            <td><%= checklist.catalogue %></td>
+            <td><%= checklist.checkstart %></td>
+            <td><%= checklist.checkend %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 
+  <div class="row mt-5">
+    <h2>
+      <span>Constructor de Checklists</span>
+      <a href="<%= new_checklist_path(Checklist.new) %>" type='button' class='btn btn-primary'>+ Agregar</a>
+    </h2>
 
-- list of LAST filled checklist
-- list of checklists
-
-<div id="checklists">
-  <% @checklists.each do |checklist| %>
-    <%= render checklist %>
-    <p>
-      <%= link_to "Show this checklist", checklist %>
-    </p>
-  <% end %>
-</div>
-
-<h2>Constructor de Checklists</h2>
-
-<%= link_to "New checklist", new_checklist_path %>
+    <table class="table">
+      <thead>
+        <th>Nombre</th> 
+        <th>Linea</th> 
+        <th></th> 
+      </thead>
+      <tbody>
+        <% @checklists.each do |checklist| %>  
+          <tr>
+            <td><%= link_to checklist.name, checklist_path(checklist) %></td>  
+            <td><%= checklist.line.name %></td>  
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 
 </div>

@@ -1,9 +1,12 @@
-<h1>New checklist</h1>
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+<h1>Nuevo Checklist</h1>
 
 <%= render "form", checklist: @checklist %>
 
-<br>
+<hr class="hr hr-blurry" />
 
-<div>
-  <%= link_to "Back to checklists", checklists_path %>
+<%= link_to "Regresar a Checklists", lines_path, class: "btn btn-primary" %>
+
 </div>

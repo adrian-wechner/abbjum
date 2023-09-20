@@ -1,14 +1,32 @@
-<p style="color: green"><%= notice %></p>
+<%= render partial: "layouts/callouts" %>
 
-<h1>Checklist records</h1>
+<div class="container mt-3 mb-3">
 
-<div id="checklist_records">
-  <% @checklist_records.each do |checklist_record| %>
-    <%= render checklist_record %>
-    <p>
-      <%= link_to "Show this checklist record", checklist_record %>
-    </p>
-  <% end %>
+  <div class="row" id="checklists">
+    <h1>
+      <span>Checklists Records</span>
+      <a href="<%= new_checklist_record_path(ChecklistRecord.new) %>" type='button' class='btn btn-primary'>+ Agregar</a>
+    </h1>
+    <table class="table">
+      <thead>
+        <th>Linea</th>
+        <th>Checklist</th>
+        <th>Catalogo</th>
+        <th>Iniciado</th>
+        <th>Terminado</th>
+      </thead>  
+      <tbody>
+        <% @checklist_records.each do |checklist| %>
+          <tr>
+            <td><%= checklist.line.name %></td>
+            <td><%= checklist.name %></td>
+            <td><%= checklist.catalogue %></td>
+            <td><%= checklist.checkstart %></td>
+            <td><%= checklist.checkend %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
 </div>
-
-<%= link_to "New checklist record", new_checklist_record_path %>

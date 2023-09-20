@@ -3,7 +3,8 @@ class ChecklistsController < ApplicationController
 
   # GET /checklists or /checklists.json
   def index
-    @checklists = Checklist.all
+    @checklists = Checklist.joins(:line)
+    @checklist_records = ChecklistRecord.order(created_at: :desc).where("checkend = NULL OR (checklist_records.created_at > (now() - interval '1 week'))").joins(:line)
   end
 
   # GET /checklists/1 or /checklists/1.json
