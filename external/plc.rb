@@ -15,6 +15,26 @@ def trck_file_path(line_ident, station_name, part_instance, file_appendix, root_
   File.join(root_path, relative_folder_to_part_instance(line_ident, station_name, part_instance), trck_file_name(line_ident, station_name, part_instance, file_appendix))
 end
 
+def hipot_command(client, data)
+
+  # HIPOT data can include : charater.
+  # will rejoin, and ONLY split into 3 parts. This will preserver 
+  # the full HIPOT content string
+  data = data.join(":").split(":",3)
+
+  if data.length != 3
+    puts "PLC SCRIPT: ERROR: WRONG LENGTH(4) for HIPOT command"
+    client.close
+    return false
+  end
+
+  line_id = data[1] # "example: MET"
+  content = data[2]
+  content.sub!("__NL__", "\n")
+
+  puts content
+end
+
 # MODEL/INSTANCE/TIMESTAMP 
 def model_command(client, data)
   if data.length != 4
@@ -126,7 +146,8 @@ loop {
 
     client = server.accept
     data = client.gets
-    puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime + ' DATA=' + data
+    #puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime + ' DATA=' + data
+    puts "#{data.length}:#{data}"
 
     # any client request is data formated as COMMAND:[data1]:[data2]:[etc...] 
     data = data.split(":")
@@ -147,6 +168,13 @@ loop {
       client.puts "PLC SCRIPT: STOP"
       client.close
       break # jump out of infinity-loop
+    end
+
+    ### HIPOT COMMAND
+    # HIPOT:[LINE_IDENT]:...data... (may contain :)
+    if command == "HIPOT"
+      hipot_command(client, data)
+      next
     end
 
     # PART COMMAND
