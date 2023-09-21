@@ -73,6 +73,10 @@ def model_command(client, data)
   return true
 end
 
+def hipot_command(client, data)
+  puts data.inspect
+end
+
 def trck_command(client, data)
   if data.length < 4 or data.length > 5
     puts "PLC SCRIPT: ERROR: WRONG LENGTH(4-5) for TRCK command"
@@ -202,6 +206,11 @@ loop {
       next
     end
 
+    ### HIPOT COMMAND
+    # HIPOT:[LINE_IDENT]:...data...
+    if command == "HIPOT"
+      hipot_command(client, data)
+    end
 
     ### ECHO COMMAND
     ### ECHO:any text here will be returned

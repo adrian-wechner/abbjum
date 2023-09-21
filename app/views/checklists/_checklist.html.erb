@@ -1,0 +1,36 @@
+<div class="row mb-3 bg-primary-subtle" id="<%= dom_id checklist %>">
+  <h1>General</h1>
+  <p>
+    <strong>Line:</strong>
+    <%= checklist.line.name %>
+  </p>
+
+  <p>
+    <strong>Name:</strong>
+    <%= checklist.name %>
+  </p>
+
+</div>
+
+<div class="row mb-3">
+  <table class="table">
+    <thead>
+      <th>Ident. Unica</th> 
+      <th>Tipo</th> 
+      <th>Pregunta</th> 
+      <th>Respuestas Principales</th> 
+      <th>Tipo de Respuesta</th> 
+    </thead> 
+    <tbody>
+      <% checklist.checklist_items.each do |item| %>
+        <tr>
+          <td><%= item.ident %></td>
+          <td><%= item.itemtype %></td>
+          <td><%= item.label %></td>
+          <td><%= item.primaryanswers %></td>
+          <td><%= item.primaryanswertype %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

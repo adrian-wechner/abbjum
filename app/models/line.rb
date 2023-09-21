@@ -1,6 +1,8 @@
 class Line < ApplicationRecord
   has_one_attached :file, dependent: :destroy
   has_many :stations
+  has_many :checklists
+  has_many :checklist_records
 
  def translated_models_for_options
   # [['Option1', 1], ['Option2', 2], ...]

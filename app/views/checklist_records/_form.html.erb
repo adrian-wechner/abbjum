@@ -1,0 +1,77 @@
+<%= form_with(model: checklist_record) do |form| %>
+  <% if checklist_record.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(checklist_record.errors.count, "error") %> prohibited this checklist_record from being saved:</h2>
+
+      <ul>
+        <% checklist_record.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :checklist_id, style: "display: block" %>
+    <%= form.number_field :checklist_id %>
+  </div>
+
+  <div>
+    <%= form.label :user_start_id, style: "display: block" %>
+    <%= form.number_field :user_start_id %>
+  </div>
+
+  <div>
+    <%= form.label :user_complete_id, style: "display: block" %>
+    <%= form.number_field :user_complete_id %>
+  </div>
+
+  <div>
+    <%= form.label :line_id, style: "display: block" %>
+    <%= form.number_field :line_id %>
+  </div>
+
+  <div>
+    <%= form.label :catalogue, style: "display: block" %>
+    <%= form.text_field :catalogue %>
+  </div>
+
+  <div>
+    <%= form.label :checkstart, style: "display: block" %>
+    <%= form.datetime_field :checkstart %>
+  </div>
+
+  <div>
+    <%= form.label :checkend, style: "display: block" %>
+    <%= form.datetime_field :checkend %>
+  </div>
+
+  <div>
+    <%= form.label :quantity, style: "display: block" %>
+    <%= form.number_field :quantity %>
+  </div>
+
+  <div>
+    <%= form.label :shift, style: "display: block" %>
+    <%= form.number_field :shift %>
+  </div>
+
+  <div>
+    <%= form.label :comments, style: "display: block" %>
+    <%= form.text_area :comments %>
+  </div>
+
+  <div>
+    <%= form.label :deviationrun, style: "display: block" %>
+    <%= form.check_box :deviationrun %>
+  </div>
+
+  <div>
+    <%= form.label :deviationcomment, style: "display: block" %>
+    <%= form.text_area :deviationcomment %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

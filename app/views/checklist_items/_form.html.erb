@@ -1,0 +1,57 @@
+<%= form_with(model: checklist_item) do |form| %>
+  <% if checklist_item.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(checklist_item.errors.count, "error") %> prohibited this checklist_item from being saved:</h2>
+
+      <ul>
+        <% checklist_item.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :checklist_id, style: "display: block" %>
+    <%= form.number_field :checklist_id %>
+  </div>
+
+  <div>
+    <%= form.label :ident, style: "display: block" %>
+    <%= form.text_field :ident %>
+  </div>
+
+  <div>
+    <%= form.label :label, style: "display: block" %>
+    <%= form.text_field :label %>
+  </div>
+
+  <div>
+    <%= form.label :primaryanswers, style: "display: block" %>
+    <%= form.text_field :primaryanswers %>
+  </div>
+
+  <div>
+    <%= form.label :primaryanswertype, style: "display: block" %>
+    <%= form.number_field :primaryanswertype %>
+  </div>
+
+  <div>
+    <%= form.label :itemtype, style: "display: block" %>
+    <%= form.number_field :itemtype %>
+  </div>
+
+  <div>
+    <%= form.label :ordernum, style: "display: block" %>
+    <%= form.number_field :ordernum %>
+  </div>
+
+  <div>
+    <%= form.label :secondaryanswertype, style: "display: block" %>
+    <%= form.number_field :secondaryanswertype %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
