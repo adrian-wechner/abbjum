@@ -3,12 +3,20 @@ require 'pg'
 require 'json'
 require 'fileutils'
 
+def safe_puts(client, msg)
+  begin
+    client.puts msg
+  rescue Exception
+    client.close if client
+  end
+end
+
 def relative_folder_to_part_instance(line_ident, station_name, part_instance)
   "/#{line_ident}/#{part_instance}/#{station_name}/"
 end
 
 def trck_file_name(line_ident, station_name, part_instance, file_appendix)
-  "#{Time.now.strftime("%Y-%m-%d %H-%M-%S")} #{line_ident} #{station_name} #{part_instance} #{file_appendix}"
+  "#{Time.now.strftime("%Y-%m-%d %H-%M-%S")} #{line_ident} #{station_name} #{part_instance} #{file_appendix.gsub("/", "-")}"
 end
 
 def trck_file_path(line_ident, station_name, part_instance, file_appendix, root_path="")
@@ -53,13 +61,17 @@ def model_command(client, data)
   conn = PG.connect(:dbname => PG_DBNAME)
 
   if model 
-    if station_name == "LINE"
+    if station_name == "LINE" or station_name == "ST10"
       sql = "UPDATE lines SET default_model = '#{model}' WHERE line_identifier = '#{line_id}'"
-    else
-      sql = "UPDATE stations SET model = '#{model}' WHERE line_id IN (SELECT id from lines where line_identifier = '#{line_id}') and name = '#{station_name}'"
+      #puts "Update Line default model: #{sql}"
+      res  = conn.exec(sql) 
     end
-    puts sql
-    res  = conn.exec(sql) 
+    
+    if station_name != "LINE"
+      sql = "UPDATE stations SET model = '#{model}' WHERE line_id IN (SELECT id from lines where line_identifier = '#{line_id}') and name = '#{station_name}'"
+      #puts "Update Station model: #{sql}"
+      res  = conn.exec(sql) 
+    end
   end
 
   if part_instance
@@ -124,7 +136,7 @@ def trck_command(client, data)
   end
   File.write(file_name, file_content)
 
-  client.puts "OK"
+  safe_puts(client, "OK")
   return true
 end
 
@@ -149,9 +161,9 @@ loop {
   begin
 
     client = server.accept
-    data = client.gets
+    data = client.gets.gsub(/^(\W*)/,"").strip # filter out any non-alphanumerica characters until first char
     #puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime + ' DATA=' + data
-    puts "#{data.length}:#{data}"
+    puts "#{Time.now.ctime}==#{data.length}==#{data}"
 
     # any client request is data formated as COMMAND:[data1]:[data2]:[etc...] 
     data = data.split(":")
@@ -187,6 +199,7 @@ loop {
     # a) PART will trigger a MODEL command using the 'model' part of the string
     # b) PART will trigger a TRCK command using the full string given if formated as "model/sequence/timestamp"
     if command == "PART"
+      puts "INSIDE PART.... #{data}"
       # CALL MODEL
       model_command(client, data)
 
