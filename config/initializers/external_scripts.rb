@@ -1,8 +1,8 @@
 require 'pg'
 
-puts ENV["RAILS_ENV"]
-puts Rails.env.to_s
-puts Rails.env.inspect
+#puts ENV["RAILS_ENV"]
+#puts Rails.env.to_s
+#puts Rails.env.inspect
 
 db_conf =  ActiveRecord::Base.configurations.configs_for env_name: Rails.env.to_s
 dbname = db_conf.first.database
@@ -24,9 +24,11 @@ if res_line.cmd_tuples == 1
   client.close if client
 else
   res_line.each do |s|
-    puts "res_line: #{s}"
+    #puts "res_line: #{s}"
     s["ips"].to_s.split(",").each do |ip| 
-      ingersoll_threads.push Thread.new { system("ruby ./external/ingersoll_eor.rb -h #{ip} -l #{s['lid']} -s #{s['sname']}") }
+      cmd = "ruby ./external/ingersoll_eor.rb -h #{ip} -l #{s['lid']} -s #{s['sname']}"
+      #puts cmd
+      ingersoll_threads.push Thread.new { system(cmd) }
     end
   end 
 end

@@ -23,7 +23,7 @@ end
 # conn = PG.connect(:dbname => dbname)
 dbug = "[ISOLL #{host}]"
 # debug values
-print "#{dbug} Open connection #{host}:#{port}...\n"
+puts "#{dbug} Open connection #{host}:#{port}"
 
 # connect to server, send command and debug response
 loop {
@@ -58,10 +58,12 @@ loop {
     end
     puts "\n#{dbug} Connection closed by Ingersoll Controller (#{host}:#{port})"
     ingersoll.close
+  rescue Interrupt
+    ingersoll.close if ingersoll && !ingersoll.closed?
+    break # end loop and exit
   rescue
     print "#"
     ingersoll.close if ingersoll
   end
 }
-
 puts "#{dbug} INGERSOLL exiting..."
