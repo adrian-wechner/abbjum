@@ -36,21 +36,52 @@ def trck_file_path(line_ident, station_name, part_instance, file_appendix, root_
   File.join(root_path, relative_folder_to_part_instance(line_ident, station_name, part_instance), trck_file_name(line_ident, station_name, part_instance, file_appendix))
 end
 
+# CHECK LINE
+def check_line(conn, client, line_ident)
+  query_line = "SELECT * from lines where line_identifier = '#{line_ident}';" 
+  res_line  = conn.exec(query_line)
+  # if the query affects 1 row, the query is clearly wrong. terminate client
+  if res_line.cmd_tuples != 1
+    error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmb_tuples}) => #{query_line}"
+    puts error_msg
+    client.puts "NOK:#{error_msg}" if client
+    client.close if client
+    return nil # false
+  end
+  return res_line
+end
+
+# CHECK STATION
+def check_station(conn, client, line_ident, station_name)
+  query_station = "SELECT * from stations where line_id IN (SELECT id from lines where line_identifier = '#{line_ident}') AND name = '#{station_name}'"
+  res_station = conn.exec(query_station)
+  # if the query affects 1 row, the query is clearly wrong. terminate client
+  if res_station.cmd_tuples != 1
+    error_msg = "ERROR: SELECT query did affect 1 row. Rather (#{res_station.cmb_tuples}) => #{query_line}"
+    puts error_msg
+    client.puts "NOK:#{error_msg}" if client
+    client.close if client
+    return nil # false 
+  end
+  return res_station
+end
+
 def hipot_command(client, data)
 
   # HIPOT data can include : charater.
   # will rejoin, and ONLY split into 3 parts. This will preserver 
   # the full HIPOT content string
-  data = data.join(":").split(":",3)
+  data = data.join(":").split(":",4)
 
-  if data.length != 3
+  if data.length != 4
     puts "PLC SCRIPT: ERROR: WRONG LENGTH(4) for HIPOT command"
     client.close
     return false
   end
 
   line_ident = data[1] # "example: MET"
-  content = data[2].gsub("__NL__", "\n")
+  station_name = data[2] # "example: ST80"
+  content = data[3].gsub("__NL__", "\n")
 
   begin
     csv = CSV.parse(content, headers: true).by_row
@@ -59,26 +90,37 @@ def hipot_command(client, data)
     return
   end
 
-  puts "WRITE HIPOT"
-  File.write("tmp/hipot_latest.csv", csv.to_csv)
+  res_line = check_line(conn, client, line_ident)
 
   i = csv.length - 1
   while i >= 0 
     row = csv.value_at(i)
     
     # generate file name
-    folder = relative_folder_to_part_instance(line_ident, station_name, part_instance)
-    filename = "..."
+    folder = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No'])
+    found = false
+    Dir["#{folder}/*.csv"].each do |file|
+      # if a file with the same suffix in the same folder already exists
+      # then this data has been stored already. And any further advancements
+      # in the csv file can be stopped. As we already found the most recent
+      # stored value.
+      if file ~= /^#{hipot_row_into_file_suffix(row, line_ident, station_name)}/
+        found = true
+        break # leave while loop
+      end
+    end
 
-    # if file name already exists in given location
-    # then we can skip and break the while loop
+    # !! only store new data if not have been found already
+    # store using standrd function sand same "suffix"-method
+    unless found
+      filename = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No'], hipot_row_into_file_name(row, line_ident, station_name))
+      new_csv = CSV::Table::new(csv.headers, [row])
+      File.write(filename, new_csv.to_csv)
+    end
 
-    #trck_command(client, data)
-
+    # VERY IMPORTANT!
     i = i - 1
   end
-
-  #puts content
 end
 
 # MODEL/INSTANCE/TIMESTAMP 
@@ -137,29 +179,35 @@ def trck_command(client, data)
 
   conn = PG.connect(:dbname => PG_DBNAME)
 
-  # CHECK LINE
-  query_line = "SELECT * from lines where line_identifier = '#{line_id}';" 
-  res_line  = conn.exec(query_line)
-  # if the query affects 1 row, the query is clearly wrong. terminate client
-  if res_line.cmd_tuples != 1
-    error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmb_tuples}) => #{query_line}"
-    puts error_msg
-    client.puts "NOK:#{error_msg}" if client
-    client.close if client
-    return false
-  end
+  res_line = check_line(conn, client, line_id)
+  return false if res_line.nil?
 
-  # CHECK STATION
-  query_station = "SELECT * from stations where line_id IN (SELECT id from lines where line_identifier = '#{line_id}') AND name = '#{station_name}'"
-  res_station = conn.exec(query_station)
-  # if the query affects 1 row, the query is clearly wrong. terminate client
-  if res_station.cmd_tuples != 1
-    error_msg = "ERROR: SELECT query did affect 1 row. Rather (#{res_station.cmb_tuples}) => #{query_line}"
-    puts error_msg
-    client.puts "NOK:#{error_msg}" if client
-    client.close if client
-    return false 
-  end
+  res_station = check_station(conn, client, line_id, station_name)
+  return false if res_station.nil?
+
+  # # CHECK LINE
+  # query_line = "SELECT * from lines where line_identifier = '#{line_id}';" 
+  # res_line  = conn.exec(query_line)
+  # # if the query affects 1 row, the query is clearly wrong. terminate client
+  # if res_line.cmd_tuples != 1
+  #   error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmb_tuples}) => #{query_line}"
+  #   puts error_msg
+  #   client.puts "NOK:#{error_msg}" if client
+  #   client.close if client
+  #   return false
+  # end
+
+  # # CHECK STATION
+  # query_station = "SELECT * from stations where line_id IN (SELECT id from lines where line_identifier = '#{line_id}') AND name = '#{station_name}'"
+  # res_station = conn.exec(query_station)
+  # # if the query affects 1 row, the query is clearly wrong. terminate client
+  # if res_station.cmd_tuples != 1
+  #   error_msg = "ERROR: SELECT query did affect 1 row. Rather (#{res_station.cmb_tuples}) => #{query_line}"
+  #   puts error_msg
+  #   client.puts "NOK:#{error_msg}" if client
+  #   client.close if client
+  #   return false 
+  # end
 
   part_instance = res_station[0]["part_instance"].to_s.strip
   part_instance = "NO_INSTANCE" if part_instance.empty?
@@ -223,7 +271,6 @@ loop {
     ### HIPOT COMMAND
     # HIPOT:[LINE_IDENT]:...data... (may contain :)
     if command == "HIPOT"
-      puts "HIPOT!!!"
       hipot_command(client, data)
       next
     end
