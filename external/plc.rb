@@ -2,6 +2,7 @@ require 'socket'
 require 'pg'
 require 'json'
 require 'fileutils'
+require 'csv'
 
 def safe_puts(client, msg)
   begin
@@ -9,6 +10,18 @@ def safe_puts(client, msg)
   rescue Exception
     client.close if client
   end
+end
+
+def hipot_row_datetime_into_civil(row)
+  DateTime.parse("#{row['Date']} #{row['Time']}").strftime("%F %H-%M-%S")
+end
+
+def hipot_row_into_file_suffix(row, line_ident, station)
+  "#{hipot_row_datetime_into_civil(row)} #{line_ident} #{station} #{row['Serial No']} HIPOT #{row['Catalog']}"
+end
+
+def hipot_row_into_file_name(row, line_ident, station)
+  "#{hipot_row_into_file_suffix(row, line_ident, station)}-#{row['Serial No']}-#{row['Plant Code']}.csv"
 end
 
 def relative_folder_to_part_instance(line_ident, station_name, part_instance)
@@ -36,11 +49,36 @@ def hipot_command(client, data)
     return false
   end
 
-  line_id = data[1] # "example: MET"
-  content = data[2]
-  content.sub!("__NL__", "\n")
+  line_ident = data[1] # "example: MET"
+  content = data[2].gsub("__NL__", "\n")
 
-  puts content
+  begin
+    csv = CSV.parse(content, headers: true).by_row
+  rescue Exception => e
+    puts "ERROR: #{e}"
+    return
+  end
+
+  puts "WRITE HIPOT"
+  File.write("tmp/hipot_latest.csv", csv.to_csv)
+
+  i = csv.length - 1
+  while i >= 0 
+    row = csv.value_at(i)
+    
+    # generate file name
+    folder = relative_folder_to_part_instance(line_ident, station_name, part_instance)
+    filename = "..."
+
+    # if file name already exists in given location
+    # then we can skip and break the while loop
+
+    #trck_command(client, data)
+
+    i = i - 1
+  end
+
+  #puts content
 end
 
 # MODEL/INSTANCE/TIMESTAMP 
@@ -83,10 +121,6 @@ def model_command(client, data)
   client.puts "OK"
 
   return true
-end
-
-def hipot_command(client, data)
-  puts data.inspect
 end
 
 def trck_command(client, data)
@@ -163,7 +197,7 @@ loop {
     client = server.accept
     data = client.gets.gsub(/^(\W*)/,"").strip # filter out any non-alphanumerica characters until first char
     #puts 'PLC SCRIPT: --- receiving data at ' + Time.now.ctime + ' DATA=' + data
-    puts "#{Time.now.ctime}==#{data.length}==#{data}"
+    puts "#{Time.now.ctime}==#{data.length}==#{data[0,100]}"
 
     # any client request is data formated as COMMAND:[data1]:[data2]:[etc...] 
     data = data.split(":")
@@ -189,6 +223,7 @@ loop {
     ### HIPOT COMMAND
     # HIPOT:[LINE_IDENT]:...data... (may contain :)
     if command == "HIPOT"
+      puts "HIPOT!!!"
       hipot_command(client, data)
       next
     end
@@ -217,12 +252,6 @@ loop {
     if command == "TRCK"
       trck_command(client, data)
       next
-    end
-
-    ### HIPOT COMMAND
-    # HIPOT:[LINE_IDENT]:...data...
-    if command == "HIPOT"
-      hipot_command(client, data)
     end
 
     ### ECHO COMMAND
