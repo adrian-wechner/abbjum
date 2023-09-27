@@ -73,9 +73,18 @@ class AbbController < ApplicationController
         # Testing for "a) Not locall avaiable"
         @what_to_show = :error if @model.to_s.empty?
         @seq_model = @line.get_seq_from_model(@model)
-
+        
         # a) choosen model. Check if avaiable locally
         if !@seq_model.to_s.empty?
+          
+          # If no model specific QG instruction avaiable in Remote folder
+          # Quality gate MUST default to "GLOBAL" instruction sheets
+          # must replace SEQ MODEL to be GLOBAL.
+          if content == "QG"
+            file = @line.line_model_station_files(:remote, content, @seq_model, station)
+            @seq_model = "GLOBAL" if file.length.zero?
+          end
+
           file = @line.line_model_station_files(:local, content, @seq_model, station)
           file.length > 0 ? file = file.first : file = "" 
           if !File.exist?(file)

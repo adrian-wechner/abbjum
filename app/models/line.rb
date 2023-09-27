@@ -4,14 +4,14 @@ class Line < ApplicationRecord
   has_many :checklists
   has_many :checklist_records
 
- def translated_models_for_options
-  # [['Option1', 1], ['Option2', 2], ...]
-  arr = model_translation.upcase.split(",").map do |e|
-    mt = e.strip.split(":") 
-    ["#{mt.first.strip}-#{mt.last.strip}", mt.last.strip] 
+  def translated_models_for_options
+    # [['Option1', 1], ['Option2', 2], ...]
+    arr = model_translation.upcase.split(",").map do |e|
+      mt = e.strip.split(":") 
+      ["#{mt.first.strip}-#{mt.last.strip}", mt.last.strip] 
+    end
+    arr.sort_by(&:last)
   end
-  arr.sort_by(&:last)
- end
 
   ### PATH FOR DFT,QG
   ### 3-OP-MET/001/3-OP-MET-001-ST1 tadadada.pdf
@@ -88,7 +88,7 @@ class Line < ApplicationRecord
 
   def line_model_station_files(location, content, model, station)
     files = Dir["#{line_model_folder_path(location, content, model)}/*"]
-    #puts "FILES DEBUG..... :#{files}"
+    #puts "!! ! ! ! ! !FILES DEBUG..... :(#{line_model_folder_path(location, content, model)})=#{files.inspect}"
     files.select {|f| f.match file_name_with_station_regex(content, model, station, "pdf") }
   end
 
