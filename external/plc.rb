@@ -72,6 +72,7 @@ def hipot_command(client, data)
   # will rejoin, and ONLY split into 3 parts. This will preserver 
   # the full HIPOT content string
   data = data.join(":").split(":",4)
+  csv = nil
 
   if data.length != 4
     puts "PLC SCRIPT: ERROR: WRONG LENGTH(4) for HIPOT command"
@@ -79,43 +80,58 @@ def hipot_command(client, data)
     return false
   end
 
+  conn = PG.connect(:dbname => PG_DBNAME)
+
   line_ident = data[1] # "example: MET"
   station_name = data[2] # "example: ST80"
   content = data[3].gsub("__NL__", "\n")
 
   begin
     csv = CSV.parse(content, headers: true).by_row
-  rescue Exception => e
-    puts "ERROR: #{e}"
+  rescue #Exception => e
+    puts "ERROR: "##{e}"
     return
   end
 
   res_line = check_line(conn, client, line_ident)
-
+  
   i = csv.length - 1
   while i >= 0 
-    row = csv.value_at(i)
+    row = csv[i]
+
+    folder = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No']))
+    files = Dir["#{folder}/*.csv"]
     
     # generate file name
-    folder = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No'])
     found = false
-    Dir["#{folder}/*.csv"].each do |file|
+    files.each do |file|
       # if a file with the same suffix in the same folder already exists
       # then this data has been stored already. And any further advancements
       # in the csv file can be stopped. As we already found the most recent
       # stored value.
-      if file ~= /^#{hipot_row_into_file_suffix(row, line_ident, station_name)}/
+      reg = Regexp.new(hipot_row_into_file_suffix(row, line_ident, station_name))
+      unless reg.match(file).nil?
+        puts "HIPOT CSV: FOUND #{file}"
         found = true
         break # leave while loop
       end
     end
 
+    break if found
+
     # !! only store new data if not have been found already
     # store using standrd function sand same "suffix"-method
     unless found
-      filename = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No'], hipot_row_into_file_name(row, line_ident, station_name))
-      new_csv = CSV::Table::new(csv.headers, [row])
-      File.write(filename, new_csv.to_csv)
+      filename = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No']), hipot_row_into_file_name(row, line_ident, station_name))
+      puts "HIPOT File NOT FOUND: #{filename}"
+      begin
+        new_csv = CSV::Table::new([row], headers: csv.headers)
+        dirname = File.dirname(filename)
+        FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
+        File.write(filename, new_csv.to_csv)
+      rescue Exception => e
+        puts "Error: #{e}"
+      end
     end
 
     # VERY IMPORTANT!
