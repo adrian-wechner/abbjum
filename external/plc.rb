@@ -94,6 +94,7 @@ def hipot_command(client, data)
   end
 
   res_line = check_line(conn, client, line_ident)
+  return false if res_line.nil?
   
   i = csv.length - 1
   while i >= 0 
@@ -200,30 +201,6 @@ def trck_command(client, data)
 
   res_station = check_station(conn, client, line_id, station_name)
   return false if res_station.nil?
-
-  # # CHECK LINE
-  # query_line = "SELECT * from lines where line_identifier = '#{line_id}';" 
-  # res_line  = conn.exec(query_line)
-  # # if the query affects 1 row, the query is clearly wrong. terminate client
-  # if res_line.cmd_tuples != 1
-  #   error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmb_tuples}) => #{query_line}"
-  #   puts error_msg
-  #   client.puts "NOK:#{error_msg}" if client
-  #   client.close if client
-  #   return false
-  # end
-
-  # # CHECK STATION
-  # query_station = "SELECT * from stations where line_id IN (SELECT id from lines where line_identifier = '#{line_id}') AND name = '#{station_name}'"
-  # res_station = conn.exec(query_station)
-  # # if the query affects 1 row, the query is clearly wrong. terminate client
-  # if res_station.cmd_tuples != 1
-  #   error_msg = "ERROR: SELECT query did affect 1 row. Rather (#{res_station.cmb_tuples}) => #{query_line}"
-  #   puts error_msg
-  #   client.puts "NOK:#{error_msg}" if client
-  #   client.close if client
-  #   return false 
-  # end
 
   part_instance = res_station[0]["part_instance"].to_s.strip
   part_instance = "NO_INSTANCE" if part_instance.empty?
