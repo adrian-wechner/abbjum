@@ -51,9 +51,11 @@ class Line < ApplicationRecord
     "#{content_prefix(content)}-#{line_identifier}"
   end
 
-  # => ~"3-OP-MET-001-ST10 *.pdf"
+  # => ~"3-OP-MET-001-ST10[ *].pdf"
   def file_name_with_station_regex(content, model, station, file_extention)
-    /#{content_prefix(content)}-#{line_identifier}-#{model}-#{station}(\s?.*)\.#{file_extention}/
+    r = Regexp.new(/#{content_prefix(content)}-#{line_identifier}-#{model}-#{station}(\s.*|-.*|)\.#{file_extention}/)
+    #puts r.inspect
+    r
   end
 
   # => ~"3-OP-MET-001*.pdf"
@@ -83,18 +85,20 @@ class Line < ApplicationRecord
 
   # return ARRAY of files. Theory should only be 1 normally
   def line_model_all_station_files(location, content, model)
-    Dir["#{line_model_folder_path(location, content, model)}/*"].match file_name_without_station_regex(content, model, "pdf")
+    Dir["#{line_model_folder_path(location, content, model)}/*"].match? file_name_without_station_regex(content, model, "pdf")
   end
 
   def line_model_station_files(location, content, model, station)
     files = Dir["#{line_model_folder_path(location, content, model)}/*"]
     #puts "!! ! ! ! ! !FILES DEBUG..... :(#{line_model_folder_path(location, content, model)})=#{files.inspect}"
-    files.select {|f| f.match file_name_with_station_regex(content, model, station, "pdf") }
+    files.select do |f| 
+      f.match? file_name_with_station_regex(content, model, station, "pdf") 
+    end
   end
 
   def line_model_station_pngs(location, content, model, station)
     files = Dir["#{line_model_folder_path(location, content, model)}/*"]
-    files.select {|f| f.match file_name_with_station_regex(content, model, station, "png") }
+    files.select {|f| f.match? file_name_with_station_regex(content, model, station, "png") }
   end
 
   def line_model_station_file_avaiable?(location, content, model, station)

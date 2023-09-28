@@ -10,9 +10,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
     <link rel="icon" type="image/svg" href="/favicon.svg">
 
-    <% if controller.controller_name == "abb" && controller.action_name == "project" %>
-      <meta http-equiv="refresh" content="15" />
-    <% end %>
+    
   </head>
 
   <body>
@@ -21,6 +19,14 @@
     <%= yield :corner %>
 
     <%= yield %>
+
+    <% if controller.controller_name == "abb" && controller.action_name == "project" %>  
+    <script>
+      setTimeout(function() {
+        location.reload();
+      }, 60000); // reload page after x seconds
+    </script>
+    <% end %>
 
   </body>
 </html>
