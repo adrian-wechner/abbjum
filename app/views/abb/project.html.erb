@@ -21,8 +21,8 @@
   </div>
 
   <div class="carousel-inner">
-    <% @images.each do |image| %>
-      <div class="carousel-item active" data-bs-interval="10000">
+    <% @images.each_with_index do |image, i| %>
+      <div class="carousel-item<%= " active" if i.zero? %>" data-bs-interval="10000">
         <img src="<%= image %>" class="d-block " alt="<%= image %>" />
       </div>
     <% end %>
