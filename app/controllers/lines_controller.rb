@@ -1,7 +1,8 @@
 require 'json'
+require 'zip'
 
 class LinesController < ApplicationController
-  before_action :set_line, only: %i[ show edit update destroy model ]
+  before_action :set_line, only: %i[ show edit update destroy model instructions update_instructions]
 
   # GET /lines or /lines.json
   def index
@@ -19,6 +20,14 @@ class LinesController < ApplicationController
 
   # GET /lines/1/edit
   def edit
+  end
+
+  # GET /lines/1/instructions
+  def instructions
+    @files = Dir["#{@line.remotepath}/**/*"]
+    @files.map! { |f| f[@line.remotepath.length..-1] }
+    # @files = Dir.entries(@line.remotepath)
+    puts @files
   end
 
   # GET /lines(/:id)/model(/:station)(/:newmodel)
@@ -93,6 +102,45 @@ class LinesController < ApplicationController
     end
   end
 
+  # PATH/PUT /lines/1/update_instructions
+  def update_instructions
+    i = 0
+    path = @line.remotepath
+    FileUtils.mkdir_p(path)
+    Zip::File.open(params[:instfile]) do |zip|
+      zip.each do |file|
+
+        if i.zero?
+          ### if first file has the right name to be a top structure then
+          ### point to this "remote" folder and extract there OVERRIDING.
+          if file.name == @line.line_folder_name(params[:instcontent])
+            # path = #.... nothing already pointing in the right direction
+          end
+          
+          ### if not top folder name then check if name is 3 chars all numeric
+          ### and nothing else folder name, then find the right path and export there.
+          if file.name.split("/").last.length == 3 && file.name.split("/").last.scan(/\D/).empty?
+            path = File.join(path, @line.line_folder_name(params[:instcontent]))
+          end
+        end
+
+        file_path = File.join(path, file.name)
+        unless file_path.include? "__MACOSX" or file_path.include? ".DS_Store"
+          puts file_path
+          FileUtils.mkdir_p(file_path) if file.ftype == :directory
+          if File.extname(file_path) == ".pdf"
+            zip.extract(file, file_path){true} if file.ftype == :file
+          end
+        end
+        i += 1
+      end
+    end
+
+    respond_to do |format|
+      format.html { redirect_to instructions_line_path(@line), notice: "Line DFT/QG was successfully updated." } 
+    end
+  end
+
   # PATCH/PUT /lines/1 or /lines/1.json
   def update
     respond_to do |format|
@@ -124,6 +172,6 @@ class LinesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def line_params
-      params.require(:line).permit(:name, :line_identifier, :model_translation, :localpath, :remotepath, :trackingpath, :file, :default_model)
+      params.require(:line).permit(:name, :line_identifier, :model_translation, :localpath, :remotepath, :trackingpath, :file, :default_model, :instfile, :instcontent)
     end
 end

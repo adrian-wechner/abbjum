@@ -14,6 +14,8 @@ Rails.application.routes.draw do
   
   resources :lines do 
     resources :stations
+    get :instructions, on: :member
+    patch :update_instructions, on: :member
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
