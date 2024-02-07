@@ -1,6 +1,8 @@
 <%= form_with(model: checklist_record) do |form| %>
+  <%= form.hidden_field :checklist_id %>
   <% if checklist_record.errors.any? %>
-    <div style="color: red">
+    <div class="row" style="color: red">
+      <div class="col col-md-12">
       <h2><%= pluralize(checklist_record.errors.count, "error") %> prohibited this checklist_record from being saved:</h2>
 
       <ul>
@@ -8,70 +10,99 @@
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
+      </div>
+
+      <hr class="hr hr-blurry" />
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :checklist_id, style: "display: block" %>
-    <%= form.number_field :checklist_id %>
+  <div class="row justify-content-md-center mt-3">
+    <div class="col col-sm-4 d-flex justify-content-start"><span class="d-flex align-content-top flex-wrap">
+      <%= form.select :line_id, Line.all.map{|l| [l.name, l.id]}, {}, { class: "form-control" } %>
+    </span></div>
+    <div class="col col-sm-4 d-flex justify-content-center"><%= image_tag "abblogo.svg", class: "img-fluid", style: "height:auto; max-width:50%;" %></div>
+    <div class="col col-sm-4 d-flex justify-content-end">4-QA-XXX</div>
   </div>
 
-  <div>
-    <%= form.label :user_start_id, style: "display: block" %>
-    <%= form.number_field :user_start_id %>
+  <div class="row mt-3 mb-3">
+    <div class="col col-lg-12">
+      <%= form.select :checklist_id, Checklist.all.map{|cl| [cl.name, cl.id]}, {}, { style: "text-align:center; font-weight:bold;", class: "form-control" } %>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :user_complete_id, style: "display: block" %>
-    <%= form.number_field :user_complete_id %>
+  <div class="row mt-3 mb-3">
+    <div class="col col-md-4">
+      <div class="row">
+        <%= form.label :product_id, "Catalogo", class: "col-sm-3 col-form-label", style: "text-align:center;" %>
+        <div class="col-sm-9">
+          <%= form.select :product_id, Product.active.map{|pr| [pr.catalog, pr.id]}, {}, { class: "form-control" } %>
+        </div>
+      </div>
+    </div>  
+    <div class="col col-md-4">
+      <div class="row">
+        <%= form.label :quantity, class: "col-sm-3 col-form-label" , style: "text-align:center;" %>
+        <div class="col-sm-8">
+          <%= form.number_field :quantity, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-4">
+      <div class="row">
+        <%= form.label :shift, class: "col-sm-3 col-form-label", style: "text-align:center;"  %>
+        <div class="col-sm-9">
+          <%= form.select :shift, [["Turno 1", 1], ["Turno 2", 2], ["Turno 3", 3]], {}, { class: "form-control" } %>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :line_id, style: "display: block" %>
-    <%= form.number_field :line_id %>
-  </div>
+  <% if checklist_record.new_record? %>
+    <div class="row justify-content-center">
+      <div class="col col-md-4 border border-dark rounded justify-content-center p-3 m-5" style="text-align:center;">
+        <i>Resto de los campos se llenan despues de inciado el checklist con los campos presentes.</i>
+      </div>
+    </div>
+  <% else %>
+    <div class="form-group">
+      <%= form.label :user_start_id, style: "display: block" %>
+      <%= form.number_field :user_start_id %>
+    </div>
 
-  <div>
-    <%= form.label :catalogue, style: "display: block" %>
-    <%= form.text_field :catalogue %>
-  </div>
+    <div class="form-group">
+      <%= form.label :user_complete_id, style: "display: block" %>
+      <%= form.number_field :user_complete_id %>
+    </div>
 
-  <div>
-    <%= form.label :checkstart, style: "display: block" %>
-    <%= form.datetime_field :checkstart %>
-  </div>
 
-  <div>
-    <%= form.label :checkend, style: "display: block" %>
-    <%= form.datetime_field :checkend %>
-  </div>
+    <div class="form-group">
+      <%= form.label :checkstart, style: "display: block" %>
+      <%= form.datetime_field :checkstart %>
+    </div>
 
-  <div>
-    <%= form.label :quantity, style: "display: block" %>
-    <%= form.number_field :quantity %>
-  </div>
+    <div class="form-group">
+      <%= form.label :checkend, style: "display: block" %>
+      <%= form.datetime_field :checkend %>
+    </div>
 
-  <div>
-    <%= form.label :shift, style: "display: block" %>
-    <%= form.number_field :shift %>
-  </div>
+    <div class="form-group">
+      <%= form.label :comments, style: "display: block" %>
+      <%= form.text_area :comments %>
+    </div>
 
-  <div>
-    <%= form.label :comments, style: "display: block" %>
-    <%= form.text_area :comments %>
-  </div>
+    <div class="form-group">
+      <%= form.label :deviationrun, style: "display: block" %>
+      <%= form.check_box :deviationrun %>
+    </div>
 
-  <div>
-    <%= form.label :deviationrun, style: "display: block" %>
-    <%= form.check_box :deviationrun %>
-  </div>
+    <div>
+      <%= form.label :deviationcomment, style: "display: block" %>
+      <%= form.text_area :deviationcomment %>
+    </div>
 
-  <div>
-    <%= form.label :deviationcomment, style: "display: block" %>
-    <%= form.text_area :deviationcomment %>
-  </div>
+    <% end %>
 
-  <div>
-    <%= form.submit %>
-  </div>
+    <div class="control-group">
+      <%= form.submit "#{checklist_record.new_record? ? "Crear Nueva" : "Actualizar"} Checklist", class: "btn btn-info"  %>
+    </div>
 <% end %>

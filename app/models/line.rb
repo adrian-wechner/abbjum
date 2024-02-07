@@ -3,12 +3,20 @@ class Line < ApplicationRecord
   has_many :stations
   has_many :checklists
   has_many :checklist_records
+  has_many :products
 
   def translated_models_for_options
+    # # [['Option1', 1], ['Option2', 2], ...]
+    # arr = model_translation.upcase.split(",").map do |e|
+    #   mt = e.strip.split(":") 
+    #   ["#{mt.first.strip}-#{mt.last.strip}", mt.last.strip] 
+    # end
+    # arr.sort_by(&:last)
+
     # [['Option1', 1], ['Option2', 2], ...]
-    arr = model_translation.upcase.split(",").map do |e|
-      mt = e.strip.split(":") 
-      ["#{mt.first.strip}-#{mt.last.strip}", mt.last.strip] 
+    arr = []
+    Product.where(line_id: id).each do |prod|
+      arr << ["#{prod.seq}-#{prod.catalog}", prod.catalog]
     end
     arr.sort_by(&:last)
   end
@@ -109,26 +117,25 @@ class Line < ApplicationRecord
   # data in "model_translation"-field will be normalized
   # any ",", space or newline will be used to delimit
   # and then any content will be striped and UpperCased
-  def get_model_translation_normalize
-    delimiters = [',', "\n"]
-    mt = model_translation.to_s.split(Regexp.union(delimiters))
-    mt.reject! { |m| m.split(":").length != 2 }
-    mt.map! do |m| 
-      m = m.split(":")
-      m[0] = m[0].strip.upcase
-      m[1] = m[1].strip.upcase
-      m
-    end
-    return mt 
-  end
+  # OLD: DEPRECATED !!
+  # def get_model_translation_normalize
+  #   delimiters = [',', "\n"]
+  #   mt = model_translation.to_s.split(Regexp.union(delimiters))
+  #   mt.reject! { |m| m.split(":").length != 2 }
+  #   mt.map! do |m| 
+  #     m = m.split(":")
+  #     m[0] = m[0].strip.upcase
+  #     m[1] = m[1].strip.upcase
+  #     m
+  #   end
+  #   return mt 
+  # end
 
   # Using normalized data from the model_translation field
   # to be used to find the ABB Sequence Number of the model number
   def get_seq_from_model(model)
-    mt = get_model_translation_normalize
-    mt.each do |m|
-      return m[0] if m[1] == model.strip.upcase
-    end
+    prod = Product.where(catalog: model, line_id: id)
+    prod.each { |pr| return pr.seq }
     return "NOK" # not found, Not-OK
   end
 end

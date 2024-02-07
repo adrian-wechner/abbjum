@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_18_151850) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_25_020439) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -60,7 +60,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_18_151850) do
     t.integer "user_start_id"
     t.integer "user_complete_id"
     t.integer "line_id"
-    t.string "catalogue"
     t.datetime "checkstart"
     t.datetime "checkend"
     t.integer "quantity"
@@ -70,6 +69,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_18_151850) do
     t.text "deviationcomment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "serialfirst"
+    t.string "serialmid"
+    t.string "seriallast"
+    t.integer "product_id"
   end
 
   create_table "checklists", force: :cascade do |t|
@@ -77,6 +80,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_18_151850) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "title"
   end
 
   create_table "lines", force: :cascade do |t|
@@ -90,6 +94,23 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_18_151850) do
     t.string "line_identifier"
     t.text "model_translation"
     t.string "default_model"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.integer "line_id"
+    t.string "seq"
+    t.string "catalog"
+    t.integer "status"
+    t.integer "cam_metric1"
+    t.integer "cam_metric2"
+    t.integer "cam_metric3"
+    t.integer "cam_metric4"
+    t.integer "cam_metric5"
+    t.integer "cam_metric6"
+    t.integer "cam_metric7"
+    t.integer "cam_metric8"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "stations", force: :cascade do |t|

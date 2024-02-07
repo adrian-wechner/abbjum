@@ -1,0 +1,75 @@
+<%= form_with(model: product) do |form| %>
+  <% if product.errors.any? %>
+    <div class="row" style="color: red">
+      <h2><%= pluralize(product.errors.count, "error") %> prohibited this product from being saved:</h2>
+
+      <ul>
+        <% product.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :line_id, style: "display: block" %>
+    <%= form.select :line_id, Line.all.map{|l|[l.name, l.id]}, {}, { class: "form-control" } %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :seq, style: "display: block" %>
+    <%= form.text_field :seq, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :catalog, style: "display: block" %>
+    <%= form.text_field :catalog, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :status, style: "display: block" %>
+    <%= form.select :status, Product.statuses.keys, {selected: :active}, { class: "form-control" } %>
+  </div>
+  <div class="col col-md-12">
+    <div class="row">
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric1, style: "display: block" %>
+        <%= form.number_field :cam_metric1, class: "form-control" %>
+      </div>
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric2, style: "display: block" %>
+        <%= form.number_field :cam_metric2, class: "form-control" %>
+      </div>
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric3, style: "display: block" %>
+        <%= form.number_field :cam_metric3, class: "form-control" %>
+      </div>
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric4, style: "display: block" %>
+        <%= form.number_field :cam_metric4, class: "form-control" %>
+      </div>
+    </div> 
+    <div class="row">
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric5, style: "display: block" %>
+        <%= form.number_field :cam_metric5, class: "form-control" %>
+      </div>
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric6, style: "display: block" %>
+        <%= form.number_field :cam_metric6, class: "form-control" %>
+      </div>
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric7, style: "display: block" %>
+        <%= form.number_field :cam_metric7, class: "form-control" %>
+      </div>
+      <div class="col col-md-3 form-group">
+        <%= form.label :cam_metric8, style: "display: block" %>
+        <%= form.number_field :cam_metric8, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= form.submit "#{product.new_record? ? "Crear Nuevo" : "Actualizar"} Producto", class: "btn btn-info" %>
+  </div>
+<% end %>

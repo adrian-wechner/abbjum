@@ -1,10 +1,16 @@
-<h1>Editing checklist item</h1>
+<%= render partial: "layouts/callouts" %>
 
-<%= render "form", checklist_item: @checklist_item %>
+<div class="container mt-3 mb-3">
 
-<br>
+  <h1>Editing checklist item</h1>
+  <%= render "form", checklist_item: @checklist_item %>
 
-<div>
-  <%= link_to "Show this checklist item", @checklist_item %> |
-  <%= link_to "Back to checklist items", checklist_items_path %>
+  <hr class="hr hr-blurry" />
+
+  <%= link_to "Ver este elemento", checklist_checklist_item_path(@checklist, @checklist_item), class: "btn btn-primary" %> |
+  <%= link_to "Regresar a checklist", checklist_checklist_item_path(@checklist), class: "btn btn-primary" %>
+
+  <hr class="hr hr-blurry" />
+
+  <%= button_to "Borrar este elemento", checklist_checklist_item_path(@checklist, @checklist_item), class: "btn btn-danger", method: :delete, data: { turbo_confirm: "Seguro que quierer borrar este elemento?" } %>
 </div>

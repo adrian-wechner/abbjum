@@ -1,10 +1,12 @@
-<h1>Editing checklist</h1>
+<%= render partial: "layouts/callouts" %>
 
-<%= render "form", checklist: @checklist %>
+<div class="container mt-3 mb-3">
+  <h1>Editing checklist</h1>
 
-<br>
+  <%= render "form", checklist: @checklist %>
 
-<div>
-  <%= link_to "Show this checklist", @checklist %> |
-  <%= link_to "Back to checklists", checklists_path %>
+  <hr class="hr hr-blurry" />
+
+  <%= link_to "Show this checklist", @checklist, class: "btn btn-primary" %> |
+  <%= link_to "Back to checklists", checklists_path, class: "btn btn-primary" %>
 </div>

@@ -1,8 +1,17 @@
 Rails.application.routes.draw do
+  resources :products do
+    get :spreadsheet, on: :collection
+    patch :update_products_xls, on: :collection
+  end
+
   devise_for :users
   resources :checklist_records
-  resources :checklist_items
-  resources :checklists
+
+  resources :checklists do
+    resources :checklist_items
+    patch :updateOrdernums, on: :member
+  end
+
   get 'tracking/index'
   get 'tracking/part'
   get 'tracking', to: "tracking#index"

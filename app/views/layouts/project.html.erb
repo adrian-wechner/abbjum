@@ -20,11 +20,11 @@
 
     <%= yield %>
 
-    <% if controller.controller_name == "abb" && controller.action_name == "project" %>  
+    <% if false && controller.controller_name == "abb" && controller.action_name == "project" && params[:inner] == "true" %>  
     <script>
       setTimeout(function() {
         location.reload();
-      }, 60000); // reload page after x seconds
+      }, 10000); // reload page after x seconds
     </script>
     <% end %>
 

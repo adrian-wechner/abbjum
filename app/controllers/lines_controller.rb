@@ -27,7 +27,7 @@ class LinesController < ApplicationController
     @files = Dir["#{@line.remotepath}/**/*"]
     @files.map! { |f| f[@line.remotepath.length..-1] }
     # @files = Dir.entries(@line.remotepath)
-    puts @files
+    # puts @files
   end
 
   # GET /lines(/:id)/model(/:station)(/:newmodel)
@@ -106,33 +106,47 @@ class LinesController < ApplicationController
   def update_instructions
     i = 0
     path = @line.remotepath
+    display_path = File.join("public/displays")
     FileUtils.mkdir_p(path)
-    Zip::File.open(params[:instfile]) do |zip|
-      zip.each do |file|
 
-        if i.zero?
-          ### if first file has the right name to be a top structure then
-          ### point to this "remote" folder and extract there OVERRIDING.
-          if file.name == @line.line_folder_name(params[:instcontent])
-            # path = #.... nothing already pointing in the right direction
-          end
-          
-          ### if not top folder name then check if name is 3 chars all numeric
-          ### and nothing else folder name, then find the right path and export there.
-          if file.name.split("/").last.length == 3 && file.name.split("/").last.scan(/\D/).empty?
-            path = File.join(path, @line.line_folder_name(params[:instcontent]))
-          end
-        end
+    if params[:instfile]
+      Zip::File.open(params[:instfile]) do |zip|
+        zip.each do |file|
 
-        file_path = File.join(path, file.name)
-        unless file_path.include? "__MACOSX" or file_path.include? ".DS_Store"
-          puts file_path
-          FileUtils.mkdir_p(file_path) if file.ftype == :directory
-          if File.extname(file_path) == ".pdf"
-            zip.extract(file, file_path){true} if file.ftype == :file
+          if i.zero?
+            ### if first file has the right name to be a top structure then
+            ### point to this "remote" folder and extract there OVERRIDING.
+            if file.name == @line.line_folder_name(params[:instcontent])
+              # path = #.... nothing already pointing in the right direction
+              # display_path = # ...
+            end
+            
+            ### if not top folder name then check if name is 3 chars all numeric
+            ### and nothing else folder name, then find the right path and export there.
+            if file.name.split("/").last.length == 3 && file.name.split("/").last.scan(/\D/).empty?
+              path = File.join(path, @line.line_folder_name(params[:instcontent]))
+              display_path = File.join(display_path, @line.line_folder_name(params[:instcontent]))
+            end
           end
+
+          file_path = File.join(path, file.name)
+          unless file_path.include? "__MACOSX" or file_path.include? ".DS_Store"
+            # puts file_path
+            # puts file
+            if file.ftype == :directory
+              FileUtils.mkdir_p(file_path) 
+              if file.name.split("/").last.length == 3 && file.name.split("/").last.scan(/\D/).empty? 
+                display_seq_dir = File.join(display_path, file.name)
+                # puts display_seq_dir
+                File.delete(*Dir["#{display_seq_dir}/*"])
+              end
+            end
+            if File.extname(file_path) == ".pdf"
+              zip.extract(file, file_path){true} if file.ftype == :file
+            end
+          end
+          i += 1
         end
-        i += 1
       end
     end
 

@@ -1,10 +1,10 @@
-<p style="color: green"><%= notice %></p>
+<%= render partial: "layouts/callouts" %>
 
-<%= render @checklist_record %>
+<div class="container mt-3 mb-3">
+  <%= render @checklist_record %>
 
-<div>
-  <%= link_to "Edit this checklist record", edit_checklist_record_path(@checklist_record) %> |
-  <%= link_to "Back to checklist records", checklist_records_path %>
-
-  <%= button_to "Destroy this checklist record", @checklist_record, method: :delete %>
+  <div class="mt-3">
+    <%= link_to "Edit this checklist record", edit_checklist_record_path(@checklist_record) %> |
+    <%= link_to "Back to checklists", checklists_path %>
+  </div>
 </div>

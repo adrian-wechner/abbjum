@@ -1,0 +1,29 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+
+  <div class="row" id="checklists">
+    <h1>
+      <span>Productos</span>
+      <a href="<%= new_product_path(Product.new) %>" type='button' class='btn btn-primary' style="display:inline-block;">+ Agregar</a>
+      <a href="<%= spreadsheet_products_path %>" type='button' class='btn btn-warning'>Actualizar productos con .xls</a>
+    </h1>
+
+    <table class="table">
+      <thead>
+        <th>Catalogo</th>
+        <th>SEQ</th>
+        <th>Status</th>
+      </thead>
+      <tbody>
+        <% @products.order(:seq).each do |product| %>
+          <tr>
+            <td><%= link_to product.catalog, product %></td>
+            <td><%= product.seq %></td>
+            <td><%= product.status %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

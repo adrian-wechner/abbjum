@@ -1,6 +1,6 @@
 <%= form_with(model: checklist) do |form| %>
   <% if checklist.errors.any? %>
-    <div style="color: red">
+    <div class="row" style="color: red">
       <h2><%= pluralize(checklist.errors.count, "error") %> prohibited this checklist from being saved:</h2>
 
       <ul>
@@ -18,7 +18,11 @@
 
   <div class="form-group">
     <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name, class: "form-control"  %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Nombre oficial / nombre de archivo"  %>
+  </div>
+  <div class="form-group">
+    <%= form.label :title, style: "display: block" %>
+    <%= form.text_field :title, class: "form-control", placeholder: "Titulo que se ve en el checklist"  %>
   </div>
 
   <div class="form-group mt-3">

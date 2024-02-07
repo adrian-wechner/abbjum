@@ -1,0 +1,17 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+
+  <h1>Editing Producto</h1>
+
+  <%= render "form", product: @product %>
+
+  <hr class="hr hr-blurry" />
+
+  <%= link_to "Ver este producto", product_path(@product), class: "btn btn-primary" %> |
+  <%= link_to "Regresar a productos", products_path, class: "btn btn-primary" %>
+  
+  <hr class="hr hr-blurry" />
+
+  <%= button_to "Borrar este producto", product_path(@product), class: "btn btn-danger", method: :delete, data: { turbo_confirm: "Seguro que quierer borrar este producto?" } %>
+</div>

@@ -1,4 +1,5 @@
 class ChecklistItemsController < ApplicationController
+  before_action :get_checklist
   before_action :set_checklist_item, only: %i[ show edit update destroy ]
 
   # GET /checklist_items or /checklist_items.json
@@ -12,7 +13,8 @@ class ChecklistItemsController < ApplicationController
 
   # GET /checklist_items/new
   def new
-    @checklist_item = ChecklistItem.new
+    # @checklist_item = ChecklistItem.new
+    @checklist_item = @checklist.checklist_items.build
   end
 
   # GET /checklist_items/1/edit
@@ -23,9 +25,12 @@ class ChecklistItemsController < ApplicationController
   def create
     @checklist_item = ChecklistItem.new(checklist_item_params)
 
+    ordernum = ChecklistItem.where(checklist_id: @checklist.id).maximum("ordernum")
+    @checklist_item.ordernum = (ordernum.to_i + 1)
+
     respond_to do |format|
       if @checklist_item.save
-        format.html { redirect_to checklist_item_url(@checklist_item), notice: "Checklist item was successfully created." }
+        format.html { redirect_to checklist_path(@checklist), notice: "Checklist item was successfully created." }
         format.json { render :show, status: :created, location: @checklist_item }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +43,7 @@ class ChecklistItemsController < ApplicationController
   def update
     respond_to do |format|
       if @checklist_item.update(checklist_item_params)
-        format.html { redirect_to checklist_item_url(@checklist_item), notice: "Checklist item was successfully updated." }
+        format.html { redirect_to checklist_url(@checklist), notice: "Checklist item was successfully updated." }
         format.json { render :show, status: :ok, location: @checklist_item }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -61,6 +66,10 @@ class ChecklistItemsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_checklist_item
       @checklist_item = ChecklistItem.find(params[:id])
+    end
+
+    def get_checklist
+      @checklist = Checklist.find(params[:checklist_id])
     end
 
     # Only allow a list of trusted parameters through.

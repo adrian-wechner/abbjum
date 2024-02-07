@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  line_id: 1
+  seq: MyString
+  catalog: MyString
+  status: 1
+  cam_metric1: 1
+  cam_metric2: 1
+  cam_metric3: 1
+  cam_metric4: 1
+  cam_metric5: 1
+  cam_metric6: 1
+  cam_metric7: 1
+  cam_metric8: 1
+
+two:
+  line_id: 1
+  seq: MyString
+  catalog: MyString
+  status: 1
+  cam_metric1: 1
+  cam_metric2: 1
+  cam_metric3: 1
+  cam_metric4: 1
+  cam_metric5: 1
+  cam_metric6: 1
+  cam_metric7: 1
+  cam_metric8: 1

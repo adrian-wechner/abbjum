@@ -1,5 +1,6 @@
 class ChecklistsController < ApplicationController
   before_action :set_checklist, only: %i[ show edit update destroy ]
+  skip_before_action :verify_authenticity_token, only: %i[ updateOrdernums ]
 
   # GET /checklists or /checklists.json
   def index
@@ -18,6 +19,21 @@ class ChecklistsController < ApplicationController
 
   # GET /checklists/1/edit
   def edit
+  end
+
+  # POST /checklists/1/updateOrdernums
+  def updateOrdernums
+
+    items = JSON.parse(params[:checklist_items])
+    items.each do |item|
+      ChecklistItem.find(item[0]).update(ordernum: item[1])
+    end
+
+
+
+    respond_to do |format|
+      format.json { render json: '{"status":"ok"}', status: :ok }
+    end
   end
 
   # POST /checklists or /checklists.json
@@ -66,6 +82,6 @@ class ChecklistsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def checklist_params
-      params.require(:checklist).permit(:line_id, :name)
+      params.require(:checklist).permit(:line_id, :name, :title)
     end
 end

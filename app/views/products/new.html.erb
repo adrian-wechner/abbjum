@@ -1,0 +1,12 @@
+<%= render partial: "layouts/callouts" %>
+
+<div class="container mt-3 mb-3">
+<h1>Nuevo Producto</h1>
+
+<%= render "form", product: @product %>
+
+<hr class="hr hr-blurry" />
+
+<%= link_to "Regresar a Productods", products_path, class: "btn btn-primary" %>
+
+</div>

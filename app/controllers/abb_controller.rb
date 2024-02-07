@@ -152,7 +152,15 @@ class AbbController < ApplicationController
       @images.concat @line.line_model_station_pngs(:local, content, @seq_model, station)
       puts "IMAGES: #{@images}"
       @images.map! { |i| i[0,6] == "public" ? i[6,100] : i } # remove "public" from the beginning of string
+
     end
 
+    # respond_to do |format|
+      if params[:inner] == "true"
+        render :project
+      else
+        render :project_outter
+      end
+    # end
   end
 end

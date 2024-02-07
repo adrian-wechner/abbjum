@@ -1,9 +1,14 @@
-<h1>New checklist record</h1>
+<%= render partial: "layouts/callouts" %>
+<div class="container mt-3 mb-3">
+  <h1>Nuevo Checklist Instancia</h1>
+  <span>Preguntas aparencen despues de haber llenado la primer parte del checklist.</span><br/>
+  <span>Elige checklist, linea, catalogo, cantidad, turno.</span>
+</div>
 
-<%= render "form", checklist_record: @checklist_record %>
+<div class="container border border-dark rounded mt-3 mb-3 pb-3">
+  <%= render "form", checklist_record: @checklist_record %>
 
-<br>
+  <hr class="hr hr-blurry" />
 
-<div>
-  <%= link_to "Back to checklist records", checklist_records_path %>
+  <%= link_to "Regresar a Checklists", checklists_path, class: "btn btn-primary" %>
 </div>
