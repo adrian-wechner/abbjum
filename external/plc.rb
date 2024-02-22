@@ -25,7 +25,21 @@ def hipot_row_into_file_name(row, line_ident, station)
 end
 
 def relative_folder_to_part_instance(line_ident, station_name, part_instance)
-  "/#{line_ident}/#{part_instance}/#{station_name}/"
+  abb_timestamp = part_instance.split("_").last
+
+  # YEAR
+  year_digit = abb_timestamp[4]
+  year = "202#{year_digit}"
+  year = "203#{year_digit}" if Time.now.year >= 2030
+
+  # WEEK
+  week_digits = abb_timestamp[5..6]
+
+  # WEEK-DAY
+  week_day_digit = abb_timestamp[8]
+
+  #### FULL SUB-STRUCTURE FOLDER PATH TO PART AND STATION
+  "/#{line_ident}/#{year}/#{week_digits}/#{week_day_digit}/#{part_instance}/#{station_name}/"
 end
 
 def trck_file_name(line_ident, station_name, part_instance, file_appendix)
@@ -37,6 +51,7 @@ def trck_file_path(line_ident, station_name, part_instance, file_appendix, root_
 end
 
 # CHECK LINE
+# RETURNS DB SERACH RESULT LINE-RECORD
 def check_line(conn, client, line_ident)
   query_line = "SELECT * from lines where line_identifier = '#{line_ident}';" 
   res_line  = conn.exec(query_line)
@@ -100,7 +115,8 @@ def hipot_command(client, data)
   while i >= 0 
     row = csv[i]
 
-    folder = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No']))
+    part_instance = "#{row['Catalog']}_#{row['Serial No']}_#{row['Plant Code']}"
+    folder = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, part_instance))
     files = Dir["#{folder}/*.csv"]
     
     # generate file name
@@ -123,7 +139,7 @@ def hipot_command(client, data)
     # !! only store new data if not have been found already
     # store using standrd function sand same "suffix"-method
     unless found
-      filename = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, row['Serial No']), hipot_row_into_file_name(row, line_ident, station_name))
+      filename = File.join(res_line[0]['trackingpath'], relative_folder_to_part_instance(line_ident, station_name, part_instance), hipot_row_into_file_name(row, line_ident, station_name))
       puts "HIPOT File NOT FOUND: #{filename}"
       begin
         new_csv = CSV::Table::new([row], headers: csv.headers)
@@ -140,7 +156,8 @@ def hipot_command(client, data)
   end
 end
 
-# MODEL/INSTANCE/TIMESTAMP 
+# MODEL/INSTANCE/TIMESTAMP
+# Stores "part_instance" into databases corresponding station
 def model_command(client, data)
   if data.length != 4
     puts "PLC SCRIPT: ERROR: WRONG LENGTH(4) for PART command"
@@ -151,12 +168,20 @@ def model_command(client, data)
   line_id = data[1] # "example: MET"
   station_name = data[2].strip.upcase
   model_data = data[3].strip.upcase.split("/")
+
+  # unwrap model data
   model = model_data[0] if model_data.length > 0
-  part_instance = model_data[1] if model_data.length > 1
+  instance = model_data[1] if model_data.length > 1
   timestamp = model_data[2] if model_data.length > 2
+
+  # Instance is not UNIQUE and TIMESTAMP is either
+  # That is why onl MODEL-INSTANCE-TIMESTAMP in combination is unique
+  # Must use Model-Instance-Timestance as "part_instance"
+  part_instance = "#{model}_#{instance}_#{timestamp}"
 
   conn = PG.connect(:dbname => PG_DBNAME)
 
+  # updating MODEL for correct DFT-QG instructions visualization
   if model 
     if station_name == "LINE" or station_name == "ST10"
       sql = "UPDATE lines SET default_model = '#{model}' WHERE line_identifier = '#{line_id}'"
@@ -171,6 +196,7 @@ def model_command(client, data)
     end
   end
 
+  # updating part_instance for correct further data tracking
   if part_instance
     sql = "UPDATE stations SET part_instance = '#{part_instance}' WHERE line_id IN (SELECT id from lines where line_identifier = '#{line_id}') and name = '#{station_name}'"
     puts sql
@@ -182,6 +208,12 @@ def model_command(client, data)
   return true
 end
 
+### TRCK COMMAND
+# TRCK:[LINE_IDENT]:[STATION_NAME]:any file name apendix:any file content
+# example: TRCK:MET:ST10:SPINDLE 192.168.0.50 PASSED:abc,def,gef
+# Purpose: To store tracking/Process data
+# IMPORTANTE: track does not specify a part-sequence number. Only the station. In order to track correctly,
+# the track command will verify WHAT "part_instance" is at station.
 def trck_command(client, data)
   if data.length < 4 or data.length > 5
     puts "PLC SCRIPT: ERROR: WRONG LENGTH(4-5) for TRCK command"
@@ -214,6 +246,10 @@ def trck_command(client, data)
   safe_puts(client, "OK")
   return true
 end
+
+########################################################################
+###############                M A I N                 #################
+########################################################################
 
 PG_DBNAME = "abbjum_development"
 PG_USERNAME = ""
@@ -271,8 +307,8 @@ loop {
     # PART COMMAND
     # Will Store the PART INSTANCE into the station's record and tracking
     # PART:[LINE_IDENT]:[STATION_NAME]:[PART INSTANCE STRING]
-    # a) PART will trigger a MODEL command using the 'model' part of the string
-    # b) PART will trigger a TRCK command using the full string given if formated as "model/sequence/timestamp"
+    # a) PART will trigger a MODEL command using the 'model' part of the string, storing MODEL and INSTANCE info for each station -> when INSTANCE NOT GIVEN, only MODEL to be updated
+    # b) PART will trigger a TRCK command using the full string given if formated as "model/sequence/timestamp" and storing process data
     if command == "PART"
       puts "INSIDE PART.... #{data}"
       # CALL MODEL
@@ -287,6 +323,7 @@ loop {
     ### TRCK COMMAND
     # TRCK:[LINE_IDENT]:[STATION_NAME]:any file name apendix:any file content
     # example: TRCK:MET:ST10:SPINDLE 192.168.0.50 PASSED:abc,def,gef
+    # Purpose: To store tracking/Process data
     # IMPORTANTE: track does not specify a part-sequence number. Only the station. In order to track correctly,
     # the track command will verify WHAT "part_instance" is at station.
     if command == "TRCK"

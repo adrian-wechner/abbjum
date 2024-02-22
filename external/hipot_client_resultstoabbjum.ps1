@@ -18,19 +18,19 @@ if ($latestFile -eq $null) {
     $client.Connect($serverIp, $port)
     $stream = $client.GetStream()
 
-    # Send the file name
-    #[System.IO.BinaryWriter]::new($stream).Write($latestFile.Name)
-
-    # Read  the file content
-    $command = "HIPOT:MET:"
-    $fileBytes = [System.IO.File]::ReadAllBytes($filePath)
+    # Read the file content
+    $fileContent = Get-Content -Path $filePath -Raw
+    $data = "HIPOT:MET:ST80:" + $fileContent
+    $data = $data.Replace("`n", "__NL__")
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($data)
     
     # Send Data
-    $data = $command+$fileBytes
-    $stream.Write($command, 0, $command.Length)
+    $stream.Write($bytes, 0, $bytes.Length)
 
     $stream.Close()
     $client.Close()
 
     Write-Host "File $latestFile sent to $serverIp on port $port"
+    Write-Host $bytes.Length
+    Write-Host "File $lastFile sent to $serverIp on port $port"
 }
