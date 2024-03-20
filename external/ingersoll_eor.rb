@@ -49,7 +49,8 @@ loop {
       puts "#{dbug} data: #{data}"
 
       # connect to server, send command and debug response
-      command = "TRCK:#{line_ident}:#{station}:SPINDLE #{host}:#{data.strip}"
+      csvheader = "Cycle Number,Power head Cycle Number,Spindle Number,Pset Number,Date,Time,Cycle Result,Peak Torque,Torque Result,Torque Units,Peak Angle,Angle Result,Shutdown Code,Peak Current,Cycle Time,Strategy type,Torque High Limit,Torque Low Limit,Angle High Limit,Angle Low Limit,Control Point,BCODE / VIN,Job Id,Step Number,Downshift Speed,Free Speed,TR,Dual Slope A High Limit,Dual Slope A Low Limit,Dual Slope B High Limit,Dual Slope B Low Limit,Gradient High Limit,Gradient Low Limit,Final Slope,Torque at Seat,Angle at Seat,Min Drag Torque,Peak Slope,Prevailing Torque Slope,Peak Cut In Torque,Peak Prevailing Torque,Average Prevailing Torque,Peak Drag Torque,Average Drag Torque,Total Batch Count,Current Batch Count,Tool Serial Number,Cp Result,Gradient Result,Dual Slope A Result,Dual Slope B Result,Unusual Fault,Motor Torque Constant Test,Free Speed Test,Max Tool Speed,Total Angle,Controller Cycle Number"
+      command = "TRCK:#{line_ident}:#{station}:SPINDLE #{host}:#{csvheader}__NL__#{data.strip}"
       client = TCPSocket.open(plc_script_host, plc_script_port)
       client.puts(command)
       puts client.gets

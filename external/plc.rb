@@ -28,15 +28,15 @@ def relative_folder_to_part_instance(line_ident, station_name, part_instance)
   abb_timestamp = part_instance.split("_").last
 
   # YEAR
-  year_digit = abb_timestamp[4]
+  year_digit = abb_timestamp[3]
   year = "202#{year_digit}"
   year = "203#{year_digit}" if Time.now.year >= 2030
 
   # WEEK
-  week_digits = abb_timestamp[5..6]
+  week_digits = abb_timestamp[4..5]
 
   # WEEK-DAY
-  week_day_digit = abb_timestamp[8]
+  week_day_digit = abb_timestamp[7]
 
   #### FULL SUB-STRUCTURE FOLDER PATH TO PART AND STATION
   "/#{line_ident}/#{year}/#{week_digits}/#{week_day_digit}/#{part_instance}/#{station_name}/"
@@ -57,7 +57,7 @@ def check_line(conn, client, line_ident)
   res_line  = conn.exec(query_line)
   # if the query affects 1 row, the query is clearly wrong. terminate client
   if res_line.cmd_tuples != 1
-    error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmb_tuples}) => #{query_line}"
+    error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmd_tuples}) => #{query_line}"
     puts error_msg
     client.puts "NOK:#{error_msg}" if client
     client.close if client
@@ -72,13 +72,28 @@ def check_station(conn, client, line_ident, station_name)
   res_station = conn.exec(query_station)
   # if the query affects 1 row, the query is clearly wrong. terminate client
   if res_station.cmd_tuples != 1
-    error_msg = "ERROR: SELECT query did affect 1 row. Rather (#{res_station.cmb_tuples}) => #{query_line}"
+    error_msg = "ERROR: SELECT query did affect 1 row. Rather (#{res_station.cmd_tuples}) => #{query_station}"
     puts error_msg
     client.puts "NOK:#{error_msg}" if client
     client.close if client
     return nil # false 
   end
   return res_station
+end
+
+# CHECK PRODUCT
+def check_product(conn, client, model_name)
+  query_product = "SELECT * from products where catalog = '#{model_name}'"
+  res_product = conn.exec(query_product)
+  # if the query affects 1 row, the query is clearly wrong. terminate client
+  if res_product.cmd_tuples != 1
+    error_msg = "ERROR: SELECT query did affect 1 row. Rather (#{res_product.cmd_tuples}) => #{query_product}"
+    puts error_msg
+    client.puts "NOK:#{error_msg}" if client
+    client.close if client
+    return nil # false 
+  end
+  return res_product
 end
 
 def hipot_command(client, data)
@@ -223,7 +238,8 @@ def trck_command(client, data)
 
   line_id = data[1]
   station_name = data[2]
-  file_appendix = "#{data[3]}.txt"
+  data[3] = data[3].gsub("__NL__", "\n")
+  file_appendix = "#{data[3]}.#{data[3].include?("SPINDLE") ? "csv" : "txt"}"
   file_content = data[4] if data.length >= 5
 
   conn = PG.connect(:dbname => PG_DBNAME)
