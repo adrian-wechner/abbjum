@@ -77,13 +77,11 @@ class AbbController < ApplicationController
         # a) choosen model. Check if avaiable locally
         if !@seq_model.to_s.empty?
           
-          # If no model specific QG instruction avaiable in Remote folder
-          # Quality gate MUST default to "GLOBAL" instruction sheets
+          # If no model specific QG or DFT instruction avaiable in Remote folder
+          # Quality gate OR DFT MUST default to "GLOBAL" instruction sheets
           # must replace SEQ MODEL to be GLOBAL.
-          if content == "QG"
-            file = @line.line_model_station_files(:remote, content, @seq_model, station)
-            @seq_model = "GLOBAL" if file.length.zero?
-          end
+          file = @line.line_model_station_files(:remote, content, @seq_model, station)
+          @seq_model = "GLOBAL" if file.length.zero?
 
           file = @line.line_model_station_files(:local, content, @seq_model, station)
           file.length > 0 ? file = file.first : file = "" 

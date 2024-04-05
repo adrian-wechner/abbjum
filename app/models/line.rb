@@ -112,24 +112,6 @@ class Line < ApplicationRecord
   def line_model_station_file_avaiable?(location, content, model, station)
     line_model_station_files(location, content, model, station).length > 0
   end
-  
-
-  # data in "model_translation"-field will be normalized
-  # any ",", space or newline will be used to delimit
-  # and then any content will be striped and UpperCased
-  # OLD: DEPRECATED !!
-  # def get_model_translation_normalize
-  #   delimiters = [',', "\n"]
-  #   mt = model_translation.to_s.split(Regexp.union(delimiters))
-  #   mt.reject! { |m| m.split(":").length != 2 }
-  #   mt.map! do |m| 
-  #     m = m.split(":")
-  #     m[0] = m[0].strip.upcase
-  #     m[1] = m[1].strip.upcase
-  #     m
-  #   end
-  #   return mt 
-  # end
 
   # Using normalized data from the model_translation field
   # to be used to find the ABB Sequence Number of the model number
