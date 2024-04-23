@@ -18,7 +18,7 @@ Rails.application.config.after_initialize do
     res_line  = conn.exec(sql)
     # if the query affects 1 row, the query is clearly wrong. terminate client
     if res_line.cmd_tuples == 1
-      error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmb_tuples}) => #{query_line}"
+      error_msg = "PLC SCRIPT: ERROR: SELECT query did affect 1 row. Rather (#{res_line.cmd_tuples}) => #{query_line}"
       puts error_msg
       client.puts "NOK:#{error_msg}" if client
       client.close if client
@@ -32,6 +32,9 @@ Rails.application.config.after_initialize do
         end
       end 
     end
+
+    # Start Cam Images Script
+    image_thread = Thread.new { system("ruby ./external/images.rb") }
 
   end
 end
