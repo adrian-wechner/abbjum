@@ -1,21 +1,26 @@
 require 'pg'
 require 'fileutils'
+require 'yaml'
 
 PG_DBNAME = "abbjum_development"
 PG_USERNAME = ""
 PG_PASSWORD = ""
-LINE = "MET"
+
+
 
 def rootTrackingFolder()
   "/home/abb/Documents/TRACKING"
 end
 
-def rootCamFolder()
-  "/home/abb/Documents/CAM90/CAM1"
+def rootCamFolders()
+  ["/home/abb/Documents/CAM40/CAM2","/home/abb/Documents/CAM90/CAM1"]
 end
 
 def getImagesInFolder()
-  Dir["#{rootCamFolder}/*"]
+  files = []
+  rootCamFolders.each { |folder| files = files.concat(Dir["#{folder}/*"]) }
+  #files.each { |f| puts f}
+  return files
 end
 
 loop {
@@ -25,19 +30,21 @@ loop {
     # Sleep for a few seconds. Non time critial. Just give it some time.
     sleep 5
 
+    appConf = YAML.load_file('/home/abb/Documents/abbjum.yaml')
+
     # Get Images, otherwise, wait next loop
     images = getImagesInFolder()
     next if images.length.zero?
 
     # Get Part Instance
     conn = PG.connect(:dbname => PG_DBNAME)
-    sql = "SELECT id, part_instance from stations where name = 'ST90'"
+    sql = "SELECT id, part_instance from stations where name = '#{appConf["camstation"]}'"
     res  = conn.exec(sql)
-    sta90_part_instance = res[0]["part_instance"].to_s.strip
+    sta_part_instance = res[0]["part_instance"].to_s.strip
 
 
     ## GET FULL FOLDER PATH BASED ON PART INSTANCE
-    abb_timestamp = sta90_part_instance.split("_").last
+    abb_timestamp = sta_part_instance.split("_").last
 
     # YEAR
     year_digit = abb_timestamp[3]
@@ -51,14 +58,15 @@ loop {
     week_day_digit = abb_timestamp[7]
 
     #### FULL SUB-STRUCTURE FOLDER PATH TO PART AND STATION
-    folderPath = "/#{LINE}/#{year}/#{week_digits}/#{week_day_digit}/#{sta90_part_instance}/ST90"
+    folderPath = "#{appConf["camline"]}/#{year}/#{week_digits}/#{week_day_digit}/#{sta_part_instance}/#{appConf["camstation"]}"
     #"#{Time.now.strftime("%Y-%m-%d %H-%M-%S")} #{line_ident} #{station_name} #{part_instance} #{file_appendix.gsub("/", "-")}"
 
     ## Move File to folderPath
     images.each do |im|
-      newFileName = "#{Time.now.strftime("%Y-%m-%d %H-%M-%S")} #{LINE} ST90 #{abb_timestamp[1]} IMAGE #{sta90_part_instance}.jpg"
-      FileUtils.mv(im, "#{rootTrackingFolder}/#{folderPath}/#{newFileName}")
+
+      newFileName = "#{Time.now.strftime("%Y-%m-%d %H-%M-%S")} #{appConf["camline"]} #{appConf["camstation"]} #{abb_timestamp[1]} IMAGE #{sta_part_instance}.jpg"
       puts "IMAGES: #{im} -> #{folderPath}/#{newFileName}"
+      FileUtils.mv(im, "#{rootTrackingFolder}/#{folderPath}/#{newFileName}")
     end
 
 
